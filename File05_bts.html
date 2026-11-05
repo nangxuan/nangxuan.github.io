@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HỆ THỐNG TRÍCH XUẤT 05 - LÁ ĐỨNG (Đ) & NGƯỢC (N)</title>
+    <style>
+        :root {
+            --sage:    #4a7c59;
+            --sage-dk: #2e5c3e;
+            --sage-lt: #eaf4ec;
+            --cream:   #faf8f3;
+            --mist:    #8a9e8e;
+            --amber:   #c8864a;
+            --sky:     #4a7fa5;
+            --sky-dk:  #2d5f80;
+            --warn:    #c07040;
+            --text:    #2c3a2e;
+            --border:  #c8d8ca;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #dce8dd 0%, #e8e0d0 100%);
+            min-height: 100vh;
+            padding: 16px;
+            color: var(--text);
+        }
+
+        .wrapper {
+            max-width: 560px;
+            margin: 0 auto;
+            background: var(--cream);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(46,92,62,0.13), 0 2px 8px rgba(0,0,0,0.07);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--sage-dk) 0%, var(--sage) 100%);
+            padding: 22px 20px 18px;
+            text-align: center;
+        }
+        .header h2 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+        .header small {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 400;
+        }
+
+        .body { padding: 20px 18px 24px; }
+
+        .pair-section {
+            background: var(--sage-lt);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 14px 10px;
+            margin-bottom: 14px;
+        }
+        .pair-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--sage-dk);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pair-label::before {
+            content: '';
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: var(--sage);
+            border-radius: 50%;
+        }
+        .pair-label .hint {
+            font-weight: 400;
+            color: var(--mist);
+            font-size: 10px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .form-row { margin-bottom: 10px; position: relative; }
+
+        .form-row label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--sage-dk);
+            margin-bottom: 5px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .lbl-badge {
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            font-size: 11px; font-weight: 700;
+            flex-shrink: 0;
+        }
+        .lbl-badge.d { background: var(--sage);  color: #fff; }
+        .lbl-badge.n { background: var(--amber); color: #fff; }
+
+        .preview-chip {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.03em;
+            background: #e0e0e0;
+            color: #999;
+            min-width: 24px;
+            text-align: center;
+            transition: background .2s, color .2s;
+            white-space: nowrap;
+        }
+        .preview-chip.valid   { background: var(--sage-lt); color: var(--sage-dk); border: 1px solid var(--sage); }
+        .preview-chip.partial { background: #fff8f0; color: var(--amber); border: 1px solid var(--amber); }
+
+        .input-wrap { position: relative; }
+
+        input.in-card {
+            width: 100%;
+            padding: 13px 44px 13px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            background: #fff;
+            color: var(--text);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            font-family: inherit;
+        }
+        input.in-card:focus {
+            border-color: var(--sage);
+            box-shadow: 0 0 0 3px rgba(74,124,89,0.12);
+        }
+        input.in-card.corrected {
+            border-color: var(--sage);
+            background: #f4fbf5;
+        }
+
+        .kh-badge {
+            position: absolute;
+            right: 10px; top: 50%;
+            transform: translateY(-50%);
+            width: 28px; height: 28px;
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 800;
+            pointer-events: none;
+            transition: all .2s;
+            background: #eee; color: #bbb;
+        }
+        .kh-badge.d  { background: #d6eedd; color: var(--sage-dk); }
+        .kh-badge.n  { background: #fef0e0; color: var(--amber); }
+
+        .suggest-box {
+            display: none;
+            position: absolute;
+            left: 0; top: calc(100% + 5px);
+            z-index: 99;
+            background: #fff;
+            border: 2px solid var(--sage);
+            border-radius: 11px;
+            box-shadow: 0 6px 20px rgba(46,92,62,0.16);
+            overflow: hidden;
+            min-width: 220px;
+        }
+        .suggest-box.open { display: block; }
+        .suggest-title {
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--mist);
+            padding: 7px 13px 4px;
+            background: var(--sage-lt);
+        }
+        .suggest-item {
+            padding: 12px 15px;
+            font-size: 16px; font-weight: 700;
+            cursor: pointer;
+            border-top: 1px solid var(--sage-lt);
+            color: var(--text);
+            transition: background .13s;
+        }
+        .suggest-item:hover, .suggest-item:active { background: var(--sage-lt); }
+
+        .btn-container {
+            display: flex; flex-direction: column;
+            gap: 10px; margin-top: 6px;
+        }
+        button.btn-action {
+            width: 100%; padding: 16px;
+            font-size: 16px; font-weight: 700;
+            border: none; border-radius: 12px;
+            color: #fff; cursor: pointer;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: transform .12s, filter .15s;
+            font-family: inherit;
+        }
+        button.btn-action:active { transform: scale(0.97); filter: brightness(0.92); }
+        .btn-search {
+            background: linear-gradient(135deg, var(--sage-dk), var(--sage));
+            box-shadow: 0 4px 14px rgba(46,92,62,0.28);
+        }
+        .btn-copy {
+            background: linear-gradient(135deg, var(--sky-dk), var(--sky));
+            box-shadow: 0 4px 14px rgba(45,95,128,0.26);
+        }
+
+        #output {
+            margin-top: 18px;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            min-height: 60px;
+            white-space: pre-wrap;
+            background: #fff;
+            font-size: 16px;
+            line-height: 1.75;
+            font-weight: 600;
+            color: var(--text);
+            font-family: inherit;
+        }
+        #output:empty::before {
+            content: 'Kết quả sẽ hiển thị tại đây…';
+            color: #bbb;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: var(--mist);
+            padding: 10px 0 4px;
+            letter-spacing: 0.06em;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <h2>DÒ Ý NGHĨA FILE 05</h2>
+        <small>Lá Đứng (Đ) gặp Lá Ngược (N) · Auto Correct khi bấm TÌM</small>
+    </div>
+
+    <div class="body">
+
+        <div class="pair-section">
+            <div class="pair-label">Cặp 1 <span class="hint">— cùng màu, khác ký hiệu</span></div>
+
+            <div class="form-row">
+                <label>
+                    <span class="lbl-badge d">1</span> Lá 1
+                    <span id="chip-f1" class="preview-chip">—</span>
+                </label>
+                <div class="input-wrap">
+                    <input type="text" id="f1" class="in-card"
+                        placeholder="Ví dụ: TƯỚNG XANH Đ"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                    <div id="kh-f1" class="kh-badge">·</div>
+                    <div id="sug-f1" class="suggest-box">
+                        <div class="suggest-title">Chọn quân bài:</div>
+                        <div class="suggest-item" data-for="f1" data-val="TƯỚNG">TƯỚNG</div>
+                        <div class="suggest-item" data-for="f1" data-val="TƯỢNG">TƯỢNG</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>
+                    <span class="lbl-badge n">2</span> Lá 2
+                    <span id="chip-f2" class="preview-chip">—</span>
+                </label>
+                <div class="input-wrap">
+                    <input type="text" id="f2" class="in-card"
+                        placeholder="Ví dụ: SĨ XANH N"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                    <div id="kh-f2" class="kh-badge">·</div>
+                    <div id="sug-f2" class="suggest-box">
+                        <div class="suggest-title">Chọn quân bài:</div>
+                        <div class="suggest-item" data-for="f2" data-val="TƯỚNG">TƯỚNG</div>
+                        <div class="suggest-item" data-for="f2" data-val="TƯỢNG">TƯỢNG</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pair-section">
+            <div class="pair-label">Cặp 2 <span class="hint">— cùng màu, khác ký hiệu</span></div>
+
+            <div class="form-row">
+                <label>
+                    <span class="lbl-badge d">3</span> Lá 3
+                    <span id="chip-f3" class="preview-chip">—</span>
+                </label>
+                <div class="input-wrap">
+                    <input type="text" id="f3" class="in-card"
+                        placeholder="Ví dụ: NGỰA ĐỎ Đ"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                    <div id="kh-f3" class="kh-badge">·</div>
+                    <div id="sug-f3" class="suggest-box">
+                        <div class="suggest-title">Chọn quân bài:</div>
+                        <div class="suggest-item" data-for="f3" data-val="TƯỚNG">TƯỚNG</div>
+                        <div class="suggest-item" data-for="f3" data-val="TƯỢNG">TƯỢNG</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>
+                    <span class="lbl-badge n">4</span> Lá 4
+                    <span id="chip-f4" class="preview-chip">—</span>
+                </label>
+                <div class="input-wrap">
+                    <input type="text" id="f4" class="in-card"
+                        placeholder="Ví dụ: CHỐT ĐỎ N"
+                        autocomplete="off" autocorrect="off" spellcheck="false">
+                    <div id="kh-f4" class="kh-badge">·</div>
+                    <div id="sug-f4" class="suggest-box">
+                        <div class="suggest-title">Chọn quân bài:</div>
+                        <div class="suggest-item" data-for="f4" data-val="TƯỚNG">TƯỚNG</div>
+                        <div class="suggest-item" data-for="f4" data-val="TƯỢNG">TƯỢNG</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn-action btn-search" onclick="thucHienTruyVan()">🔍 TÌM Ý NGHĨA</button>
+            <button class="btn-action btn-copy"   onclick="copyKetQua()">📋 SAO CHÉP KẾT QUẢ</button>
+        </div>
+
+        <div id="output"></div>
+        <div class="footer">STM · Hệ Thống Trích Xuất File 05</div>
+    </div>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════╗
+//  AUTO-CORRECT RULES
+// ╚══════════════════════════════════════════════════════════════╝
+
+const QUAN_LIST = ['TƯỚNG','TƯỢNG','SĨ','XE','PHÁO','NGỰA','CHỐT'];
+const MAU_LIST  = ['XANH','VÀNG','TRẮNG','ĐỎ'];
+
+function removeAccent(s) {
+    return s.normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .replace(/đ/gi,'d').replace(/Đ/g,'D')
+        .toUpperCase();
+}
+
+function detectQuan(raw) {
+    const u = raw.toUpperCase().trim();
+    if (QUAN_LIST.includes(u)) return { name: u, ambig: false };
+    const na = removeAccent(u);
+    const mapExact = {
+        'TUONG': null,
+        'SI': 'SĨ', 'SY': 'SĨ',
+        'XE': 'XE',
+        'PHAO': 'PHÁO', 'PHA': 'PHÁO',
+        'NGUA': 'NGỰA', 'NGU': 'NGỰA',
+        'CHOT': 'CHỐT', 'CHO': 'CHỐT',
+    };
+    if (mapExact[na] !== undefined) {
+        return mapExact[na] ? { name: mapExact[na], ambig: false } : { name: null, ambig: true };
+    }
+    if (na.startsWith('SI') || na.startsWith('SY')) return { name: 'SĨ', ambig: false };
+    if (na === 'X' || na.startsWith('XE'))           return { name: 'XE', ambig: false };
+    if (na.startsWith('PH'))                          return { name: 'PHÁO', ambig: false };
+    if (na.startsWith('NG'))                          return { name: 'NGỰA', ambig: false };
+    if (na.startsWith('CH'))                          return { name: 'CHỐT', ambig: false };
+    if (na.startsWith('TU') || na.startsWith('TW'))   return { name: null, ambig: true };
+    return null;
+}
+
+function detectMau(raw) {
+    const u = raw.toUpperCase().trim();
+    if (MAU_LIST.includes(u)) return u;
+    const na = removeAccent(u);
+    if (na.startsWith('XA') || na.startsWith('XH') || na === 'XAN' || na === 'XANH') return 'XANH';
+    if (na.startsWith('VA') || na.startsWith('VAN') || na === 'VANG' || na === 'VAG' || na === 'VG') return 'VÀNG';
+    if (na.startsWith('TR') || na === 'TRANG' || na === 'TRAC' || na === 'TAG' || na === 'TG') return 'TRẮNG';
+    if (na === 'DO' || na === 'D' || u === 'ĐỎ' || u === 'ĐO' || na === 'DE') return 'ĐỎ';
+    return null;
+}
+
+// ══════════════════════════════════════════════════════════
+//  FIX CHÍNH: Lấy ký hiệu từ token CUỐI CÙNG của chuỗi
+//  Tránh nhầm chữ "Đ" trong "ĐỎ"
+// ══════════════════════════════════════════════════════════
+function getKyHieu(str) {
+    if (!str) return null;
+    const tokens = str.trim().toUpperCase().split(/\s+/);
+    const last = tokens[tokens.length - 1];
+    // Ký hiệu phải là token cuối, CHỈ là "Đ" hoặc "N" (không phải ĐỎ, ĐỨNG, v.v.)
+    if (last === 'Đ' || last === 'D')  return 'Đ';
+    if (last === 'N' || last === 'M')  return 'N';
+    return null;
+}
+
+// Lấy phần tên lá KHÔNG kèm ký hiệu (bỏ token cuối nếu là Đ/N)
+function getBaseName(str) {
+    if (!str) return str;
+    const tokens = str.trim().toUpperCase().split(/\s+/);
+    const last = tokens[tokens.length - 1];
+    if (last === 'Đ' || last === 'D' || last === 'N' || last === 'M') {
+        return tokens.slice(0, -1).join(' ');
+    }
+    return tokens.join(' ');
+}
+
+function detectKyHieu(raw) {
+    if (!raw) return null;
+    const c = raw.toUpperCase().trim();
+    if (c === 'Đ' || c === 'D' || c === 'Đ.') return 'Đ';
+    if (c === 'N' || c === 'M')                 return 'N';
+    return null;
+}
+
+function parseInput(str) {
+    const s = str.toUpperCase().trim();
+    const tokens = s.split(/\s+/).filter(Boolean);
+    let quan = null, mau = null, kyHieu = null, ambig = false;
+
+    if (tokens.length >= 1) {
+        const last = tokens[tokens.length - 1];
+        const kh = detectKyHieu(last);
+        if (kh && tokens.length > 1) {
+            kyHieu = kh;
+            tokens.pop();
+        }
+    }
+    if (tokens.length >= 1) {
+        const last = tokens[tokens.length - 1];
+        const m = detectMau(last);
+        if (m && tokens.length >= 1) {
+            const rest = tokens.slice(0, -1).join(' ');
+            if (!rest || detectQuan(rest) !== null || tokens.length === 1) {
+                mau = m;
+                tokens.pop();
+            }
+        }
+    }
+    const quanStr = tokens.join(' ');
+    if (quanStr) {
+        const qr = detectQuan(quanStr);
+        if (qr) {
+            if (qr.ambig) ambig = true;
+            else quan = qr.name;
+        }
+    }
+    if (!mau) {
+        for (const m of MAU_LIST) {
+            if (s.includes(m)) { mau = m; break; }
+        }
+    }
+    if (!kyHieu) {
+        const allTokens = s.split(/\s+/);
+        for (const t of allTokens) {
+            const kh = detectKyHieu(t);
+            if (kh) { kyHieu = kh; break; }
+        }
+    }
+    return { quan, mau, kyHieu, ambig };
+}
+
+function buildCorrected(quan, mau, kyHieu) {
+    const parts = [];
+    if (quan) parts.push(quan);
+    if (mau)  parts.push(mau);
+    if (kyHieu) parts.push(kyHieu);
+    return parts.join(' ');
+}
+
+// ══════════════════════════════════════════════════════════
+//  UI STATE
+// ══════════════════════════════════════════════════════════
+const suggestTimers = {};
+
+function setupForm(fId) {
+    const inp = document.getElementById(fId);
+    const khBadge = document.getElementById('kh-' + fId);
+    const chip    = document.getElementById('chip-' + fId);
+    const sugBox  = document.getElementById('sug-' + fId);
+
+    inp.addEventListener('input', function() {
+        const pos = this.selectionStart;
+        const upped = this.value.toUpperCase();
+        if (upped !== this.value) {
+            this.value = upped;
+            try { this.setSelectionRange(pos, pos); } catch(e) {}
+        }
+        const parsed = parseInput(this.value);
+        updateKhBadge(khBadge, parsed.kyHieu);
+        updateChip(chip, parsed);
+        clearTimeout(suggestTimers[fId]);
+        if (parsed.ambig) {
+            suggestTimers[fId] = setTimeout(() => { openSuggest(sugBox); }, 1500);
+        } else {
+            closeSuggest(sugBox);
+        }
+    });
+
+    inp.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            correctField(fId);
+            const order = ['f1','f2','f3','f4'];
+            const idx = order.indexOf(fId);
+            if (idx < order.length - 1) {
+                document.getElementById(order[idx+1]).focus();
+            }
+        }
+    });
+
+    inp.addEventListener('blur', function() {
+        setTimeout(() => closeSuggest(sugBox), 200);
+    });
+}
+
+function updateKhBadge(el, kh) {
+    if (kh === 'Đ') { el.className = 'kh-badge d'; el.innerText = 'Đ'; }
+    else if (kh === 'N') { el.className = 'kh-badge n'; el.innerText = 'N'; }
+    else { el.className = 'kh-badge'; el.innerText = '·'; }
+}
+
+function updateChip(chip, parsed) {
+    if (parsed.quan && parsed.mau && parsed.kyHieu) {
+        chip.className = 'preview-chip valid';
+        chip.innerText = parsed.quan.slice(0,3) + ' ' + parsed.mau.slice(0,2) + ' ' + parsed.kyHieu;
+    } else if (parsed.quan || parsed.mau) {
+        chip.className = 'preview-chip partial';
+        chip.innerText = '…đang gõ';
+    } else {
+        chip.className = 'preview-chip';
+        chip.innerText = '—';
+    }
+}
+
+function openSuggest(box)  { box.classList.add('open'); }
+function closeSuggest(box) { box.classList.remove('open'); }
+
+document.querySelectorAll('.suggest-item').forEach(item => {
+    item.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        const fId = this.dataset.for;
+        const val = this.dataset.val;
+        const inp = document.getElementById(fId);
+        const sugBox = document.getElementById('sug-' + fId);
+        const parsed = parseInput(inp.value);
+        inp.value = buildCorrected(val, parsed.mau, parsed.kyHieu);
+        inp.classList.add('corrected');
+        closeSuggest(sugBox);
+        const p2 = parseInput(inp.value);
+        updateKhBadge(document.getElementById('kh-' + fId), p2.kyHieu);
+        updateChip(document.getElementById('chip-' + fId), p2);
+    });
+});
+
+function correctField(fId, lockMauFrom) {
+    const inp = document.getElementById(fId);
+    const raw = inp.value.trim();
+    if (!raw) return;
+    let parsed = parseInput(raw);
+    if (lockMauFrom) {
+        const parentParsed = parseInput(document.getElementById(lockMauFrom).value.trim());
+        if (parentParsed.mau) parsed.mau = parentParsed.mau;
+    }
+    if (parsed.quan && parsed.mau && parsed.kyHieu) {
+        const corrected = buildCorrected(parsed.quan, parsed.mau, parsed.kyHieu);
+        inp.value = corrected;
+        inp.classList.add('corrected');
+    }
+    updateKhBadge(document.getElementById('kh-' + fId), parsed.kyHieu);
+    updateChip(document.getElementById('chip-' + fId), parsed);
+    closeSuggest(document.getElementById('sug-' + fId));
+}
+
+['f1','f2','f3','f4'].forEach(setupForm);
+
+document.addEventListener('click', function(e) {
+    ['f1','f2','f3','f4'].forEach(fId => {
+        const inp = document.getElementById(fId);
+        const box = document.getElementById('sug-' + fId);
+        if (!inp.contains(e.target) && !box.contains(e.target)) closeSuggest(box);
+    });
+});
+
+// ══════════════════════════════════════════════════════════
+//  DATA FILE 05 — GIỮ NGUYÊN HOÀN TOÀN
+// ══════════════════════════════════════════════════════════
+const DATA_FILE_05 = `
+MÀU XANH
+1. TƯỚNG XANH Đ :
+Gặp TƯỚNG XANH N : Gặp kẻ nhiều thủ đoạn tranh giành địa vị | Công việc bị xáo trộn vì kẻ tranh cạnh
+Gặp SĨ XANH N : Quyền lợi bị lủng đoạn | Gia đình xào xáo
+Gặp TƯỢNG XANH N : Có hội hè nhiều thắng lợi cho doanh nghiệp | Cuộc thương thảo có nhiều thuận lợi
+Gặp XE XANH N : Gặp cảnh chờ đợi mỏi mòn | Thành công mỹ mãn về địa vị
+Gặp PHÁO XANH N : Khó khăn trở ngại chậm trễ về mọi mặt | Tin bất lợi cho cuộc làm ăn
+Gặp NGỰA XANH N : An nhàn nơi thôn dã | Người bạn lâm nguy lúc đi đường
+Gặp CHỐT XANH N : Người đàn ông lé mắt theo đuổi quấy phá | Thiệt hại nặng vì kẻ phản bội
+2. SĨ XANH Đ :
+Gặp TƯỚNG XANH N : Bị người thân lừa tiền | Có người đề nghị công việc mang nhiều lợi
+Gặp SĨ XANH N : Có cãi vã, kiện tụng, quấy rối | Thịnh vượng thăng chức
+Gặp TƯỢNG XANH N : Chấm dứt mối ưu phiền | Có bất bình phòng tiếng oan
+Gặp XE XANH N : Cuộc vận động sắp thành thì bị từ chối | Người rường cột trong gia đình gặp chuyện không may
+Gặp PHÁO XANH N : Người giúp việc trung thành mang sứ mạng đến | Nên can đảm thêm trong công ty, xí nghiệp, việc làm
+Gặp NGỰA XANH N : Đang khổ càng khổ nhiều | Có thể phủi tay, bôn ba
+Gặp CHỐT XANH N : Gặp người đàn bà vô duyên đeo đuổi dai dẳng | Ân tình đầu môi chót lưỡi
+3. TƯỢNG XANH Đ :
+Gặp TƯỚNG XANH N : Danh dự hoen ố, địa vị lung lay | Có sự xung đột dữ dội với kẻ toan tiếm quyền
+Gặp SĨ XANH N : Phòng mưu toan của kẻ độc ác | Nên nghe người bạn tốt xoay chuyển đổi hướng để gặt hái thành công
+Gặp TƯỢNG XANH N : Quá khứ đã qua đừng hâm nóng lại làm gì | Hứa hẹn có thực hiện được hay không đều do mình, nên uyển chuyển
+Gặp XE XANH N : Gặp thiếu nữ duyên dáng thật tâm muốn giúp mình nhưng còn e dè | Lòng tốt của mình bị hiểu nhầm
+Gặp PHÁO XANH N : Có cuộc viếng thăm của người bạn thân | Khát vọng quyến rũ, thèm thuồng đều bị lôi cuốn như nhau
+Gặp NGỰA XANH N : Khó giữ được sự đứng đắn với người lả lơi | Ngoại tình hay thông gian cũng đồng dã tâm
+Gặp CHỐT XANH N : Chỉ nên tin một nửa đối với những lời ngọt ngào | Mộng hão chỉ gây khổ tâm cho mình mà thôi
+4. XE XANH Đ :
+Gặp TƯỚNG XANH N : Phòng tiêu tan cuộc đời với kẻ hứa hẹn | Bế tắc trong mọi toan tính
+Gặp SĨ XANH N : Sung sướng mà lâu bền, đừng đòi hỏi quá đáng | Thắng lợi tạm thời về ý chí tiến thủ
+Gặp TƯỢNG XANH N : Chấm dứt một việc phiền toái | Đừng đi sâu hơn có thể phá sản
+Gặp XE XANH N : Cần phải tìm một người bảo vệ hữu hiệu | Địa vị trước mặt cần khôn khéo thêm
+Gặp PHÁO XANH N : Đừng vơ đũa cả nắm, không phải tất cả đàn bà đều ghen | Khéo léo 1 chút sẽ tìm được người đàn bà ấy. Uy quyền trong tay nàng
+Gặp NGỰA XANH N : Phòng xáo trộn đổ vỡ trong việc làm ăn | Có người mời mọc về chuyện tâm tình
+Gặp CHỐT XANH N : Tin xa về đến, mọi điều đúng theo ý nguyện | Có dấu hiệu sẽ thành công trong cuộc thương thảo
+5. PHÁO XANH Đ :
+Gặp TƯỚNG XANH N : Cạm bẫy giăng mắc không khéo sẽ chui vào | Phòng nguy hiểm rình rập
+Gặp SĨ XANH N : Muốn tiến bảy bước nên lùi ba bước | Những hứa hẹn quá trớn chỉ là hứa hẹn suông
+Gặp TƯỢNG XANH N : Có quá nhiều ý nghĩa của người đẹp | Có bất đồng ý kiến của người thân
+Gặp XE XANH N : Bất lợi trong cuộc mua danh bán tước | Phòng dính líu đến pháp luật
+Gặp PHÁO XANH N : Nên xa lánh kẻ lỗ mãng | Bạn xấu nên chấm dứt thân thiện
+Gặp NGỰA XANH N : Cần dứt khoát trước ngã ba đường, do dự sẽ thua thiệt | Chuyện không may đến đột ngột
+Gặp CHỐT XANH N : Điên đầu với chuyện không đâu | Chậm trễ nhưng có lợi
+6. NGỰA XANH Đ :
+Gặp TƯỚNG XANH N : Không nên thất vọng với 1 tin chưa rõ căn cứ | Biết rõ chỉ đau lòng mà thôi
+Gặp SĨ XANH N : Cần thêm nhiều cố gắng mới quyết định được địa vị | Có trở ngại
+Gặp TƯỢNG XANH N : Cố gắng lắm cũng hoài công mà không thành tựu | Nếu muốn đi tới đừng chú ý những áp lực của kẻ tham lam ích kỷ
+Gặp XE XANH N : Vài tia sáng thì chưa thể soi tỏ 1 căn phòng | Nếu không chấm dứt ý định thì tai họa sẽ đến
+Gặp PHÁO XANH N : Nghĩ sao làm vậy sẽ thành công | Đừng quá thất bại với lần thất bại đầu tiên
+Gặp NGỰA XANH N : Còn nhiều trở ngại cần nhẫn nại thêm | Đừng vội mừng, thất bại sẽ liền theo sau thành công
+Gặp CHỐT XANH N : Viễn cảnh thành công chỉ là 1 thứ bánh vẽ | Lương tâm và lý trí là 2 vấn đề cần xét lại
+7. CHỐT XANH Đ :
+Gặp TƯỚNG XANH N : Hậu quả tai hại của quá khứ ảnh hưởng đến tương lai | Được danh vọng, mất sự nghiệp
+Gặp SĨ XANH N : Ngày mai đổi khác, đừng sầu muộn ngày hôm nay | Buồn trong thời gian ngắn
+Gặp TƯỢNG XANH N : Nên chuyển hướng mới có hy vọng | Bất công, mất mát do phản bội mà ra
+Gặp XE XANH N : Đề phòng bị mất sự tin cậy | Người đàn bà đẹp đôi khi cũng rất đáng sợ
+Gặp PHÁO XANH N : Ghen tuông và ly tán ở kề cận nhau | Có du lịch nơi xa
+Gặp NGỰA XANH N : Lợi nhỏ nhưng động chạm đến danh dự | Thành công đến nhờ 1 vụ kiện
+Gặp CHỐT XANH N : Chuyện não nề làm giảm bớt ý chí tiến thủ | Rắc rối nhỏ, giàn xếp được
+
+📊 DATA CHUẨN: NHÓM MÀU VÀNG (FILE SỐ 5)
+1. TƯỚNG VÀNG Đ :
+Gặp TƯỚNG VÀNG N : Thất vọng trong 1 vấn đề tiền bạc | Say sưa theo đuổi mối lợi hão
+Gặp SĨ VÀNG N : Buôn lậu lường gạt phản bội | Bị phỏng tay trên
+Gặp TƯỢNG VÀNG N : Bị ăn chặn trong món tiền to | Vay được món nợ
+Gặp XE VÀNG N : Phải có bàn tay đàn bà mới được việc | Đừng khinh thường cô gái nơi quán trọ
+Gặp PHÁO VÀNG N : Món nợ cũ được hoàn lại | Hao tài không đáng kể
+Gặp NGỰA VÀNG N : Người thanh niên lùn là kẻ phá rối | Không thể tin đến 2 lần một lời hứa không thực hiện
+Gặp CHỐT VÀNG N : Dù lợi nhỏ nhưng cũng là có lợi | Phòng mất của lúc đi đường
+2. SĨ VÀNG Đ :
+Gặp TƯỚNG VÀNG N : Thành công một nửa | Thất bại vì dễ tin
+Gặp SĨ VÀNG N : Hỏng cơ hội vì quá tham lam | Chỉ thoáng thấy tiền nhưng chưa vào tay
+Gặp TƯỢNG VÀNG N : Khôn ngoan một tí sẽ tìm được kế hoạch mới | Thắng lợi sắp vào tay
+Gặp XE VÀNG N : Đường đi trước mặt là đường có lợi | Được tin hưởng gia tài
+Gặp PHÁO VÀNG N : Có xáo trộn trong việc làm | Thất bại đáng kể về món lợi
+Gặp NGỰA VÀNG N : Mất số tiền nhỏ nhưng được món lợi to | Có người đề nghị hôn nhân vì tiền
+Gặp CHỐT VÀNG N : Đừng đồng ý hùn hạp với người đang rủ rê | Của phi nghĩa khó giữ gìn
+3. TƯỢNG VÀNG Đ :
+Gặp TƯỚNG VÀNG N : Nên dừng lại đừng đi quá trớn | Tản tài nhưng tan tai
+Gặp SĨ VÀNG N : Có đổ máu vì món tiền | Có người mang lợi đến tận nhà
+Gặp TƯỢNG VÀNG N : Mất tiền to giữa lúc tưởng như cầm chắc trong tay | Hứa hẹn suông về tiền bạc đừng đeo đuổi làm gì
+Gặp XE VÀNG N : Người bạn đó không hiền, nên cẩn thận về tiền bạc | Lòng tốt của mình bị hiểu nhầm
+Gặp PHÁO VÀNG N : Đừng nên sa vào chốn ăn chơi, mất tiền còn tổn thương về danh dự | Đề phòng có sự tranh giành quyết liệt
+Gặp NGỰA VÀNG N : Ứa mắt vì người đàn bà lận sòng | Gặp người phụ nữ tốt bụng chỉ dẫn
+Gặp CHỐT VÀNG N : Chấm dứt món nợ danh dự | Thành công trong một cuộc thương thảo
+4. XE VÀNG Đ :
+Gặp TƯỚNG VÀNG N : Quá tự kiêu đôi khi cũng có hại | Bế tắc trong mọi toan tính
+Gặp SĨ VÀNG N : Người đàn bà vừa gặp là người đáng tin cậy | Đừng bối rối trước việc nhỏ nhen
+Gặp TƯỢNG VÀNG N : Bệnh tật làm ngưng trệ một món lợi không vào được | Có kẻ rình rập bên mình
+Gặp XE VÀNG N : Mười năm đốn củi thiêu hủy một giờ | Có thể phá sản vì tính nóng nảy
+Gặp PHÁO VÀNG N : Có cuộc viếng thăm bất ngờ nhiều lợi | Phát tài nhờ sức mình
+Gặp NGỰA VÀNG N : Khôn ngoan là lợi khí trong việc khuếch trương | Thành thật để hưởng xứng đáng món tiền
+Gặp CHỐT VÀNG N : Càng bay xa càng thấy mỏi cánh | Một tin buồn
+5. PHÁO VÀNG Đ :
+Gặp TƯỚNG VÀNG N : Thỏa mãn về tiền bạc | Có người giúp vốn nên can đảm thêm
+Gặp SĨ VÀNG N : Được tiền nhưng mất tình | Phòng kẻ lường gạt
+Gặp TƯỢNG VÀNG N : Chưa phải lúc tính chuyện to tát | Thành công trong việc môi giới
+Gặp XE VÀNG N : Đi hết con đường chợt thấy trước mắt là hố sâu | Phủi tay vì chuyện gia đình
+Gặp PHÁO VÀNG N : Phòng phản phúc | Thời suy vận cũng suy
+Gặp NGỰA VÀNG N : Tạm cứu vãn được tình thế | Hoàn cảnh luôn luôn khó sửa đổi
+Gặp CHỐT VÀNG N : Bù tiền của chứ không ai bù duyên nợ | Tiền vào cửa trước bước ra cửa sau
+6. NGỰA VÀNG Đ :
+Gặp TƯỚNG VÀNG N : Kẻ dã tâm toan ám hại vì món tiền nhỏ | Bị người đàn ông cùng lứa tuổi lừa bịp
+Gặp SĨ VÀNG N : Bị lợi dụng lòng tốt | Được thư báo một tin vui về tiền bạc
+Gặp TƯỢNG VÀNG N : Dịp may không đến 2 lần | Hoạnh tài bất ngờ
+Gặp XE VÀNG N : Người đã có gia đình nhưng còn sẵn sàng giúp đỡ | Có người bạn nữ đề nghị hùn hạp
+Gặp PHÁO VÀNG N : Người đi xa, của khó đợi | Tang tóc, góa bụa, nghèo túng
+Gặp NGỰA VÀNG N : Hy vọng nhỏ vẫn là hy vọng | Của vào đúng lúc
+Gặp CHỐT VÀNG N : Ước mơ tầm thường nhưng thường chắc hơn tính chuyện viễn vông | Lợi nhỏ nhưng nhiều hạnh phúc
+7. CHỐT VÀNG Đ :
+Gặp TƯỚNG VÀNG N : Qua một chuyện bối rối | Phòng rủi ro hao tài tốn của
+Gặp SĨ VÀNG N : Thành công xứng đáng về tiền bạc | Hoạnh tài ve vãn
+Gặp TƯỢNG VÀNG N : Được minh oan trong một vụ dính líu tiền bạc | Kết thúc thắng lợi một công việc
+Gặp XE VÀNG N : Ước vọng bất thành | Thất vọng vì lỡ tính sai đường
+Gặp PHÁO VÀNG N : Đề phòng bẫy tiền bằng bẫy tình | Có người bạn mời dự tiệc
+Gặp NGỰA VÀNG N : Bất lợi không nên đi tới | Được món tiền nhỏ của người bạn
+Gặp CHỐT VÀNG N : Về chốn cũ gặp lợi bất ngờ | Phòng tù tội vì tiền bạc
+📊 DATA CHUẨN: NHÓM MÀU TRẮNG (FILE SỐ 5)
+1. TƯỚNG TRẮNG Đ :
+Gặp TƯỚNG TRẮNG N : Gặp sự can thiệp phiền phức của một người quyền uy trong quân ngũ | Phải đương đầu với kẻ thù lợi hại
+Gặp SĨ TRẮNG N : Bị tức giận vô cớ | Vừa qua một cơn bệnh
+Gặp TƯỢNG TRẮNG N : Gặp người đàn bà xấu mồm mép đến đòi nợ | Dứt nợ nhỏ dẫn đến nợ to
+Gặp XE TRẮNG N : Hối hận sau cuộc ẩu đả | Có cãi vã quyết liệt vì chuyện không đâu
+Gặp PHÁO TRẮNG N : Bị nghi ngờ oan uổng | Gặp sự trả thù nguy hiểm của người đàn bà ghen
+Gặp NGỰA TRẮNG N : Việc mong đợi đã thất bại | Tin bất hạnh gây sầu lo
+Gặp CHỐT TRẮNG N : Tiền và danh dự đều lung lay | Phòng tai nạn lúc qua đò
+2. SĨ TRẮNG Đ :
+Gặp TƯỚNG TRẮNG N : Hết hy vọng trong một vấn đề về tiền bạc | Hôn nhân bị quấy phá vì kẻ bất nhân
+Gặp SĨ TRẮNG N : Ô nhục vì ghen tuông căm hờn | Phòng kẻ thù nhờ oán chạ
+Gặp TƯỢNG TRẮNG N : Chuyển bại thành thắng trong một vụ tranh tụng | Tang khó trong thân tộc
+Gặp XE TRẮNG N : Người đi xa về quấy rầy | Người bạn gái cũ mang về sự cởi mở
+Gặp PHÁO TRẮNG N : Phòng bị bệnh nặng sau thất bại | Nguy hiểm dồn dập
+Gặp NGỰA TRẮNG N : Sắp phải đi xa | Tha phương cầu thực là thượng sách
+Gặp CHỐT TRẮNG N : Qua hồi bĩ cực | Tử nạn về quân sự
+3. TƯỢNG TRẮNG Đ :
+Gặp TƯỚNG TRẮNG N : Thảm bại trong chuyện tình | Có xung đột với bạn
+Gặp SĨ TRẮNG N : Mất bình tĩnh sau khi đọc thư | Bất hòa trong gia đình
+Gặp TƯỢNG TRẮNG N : Người thanh niên đẹp trai là kẻ thù ngầm | Đừng bao giờ tin tưởng lời đường mật
+Gặp XE TRẮNG N : Chơi dao e đứt tay | Khổ lụy vì nặng tình
+Gặp PHÁO TRẮNG N : Ân hận vì việc làm vừa qua | Có hối tiếc sau một hành động bất nhã
+Gặp NGỰA TRẮNG N : Mưu sự gặp hồi vận rủi | Khó vượt cơn sóng gió
+Gặp CHỐT TRẮNG N : Thay đổi nhiệm sở vì địa vị thay đổi | Thắng lợi trên giấy tờ
+4. XE TRẮNG Đ :
+Gặp TƯỚNG TRẮNG N : Cạm bẫy đáng sợ trong bóng tối | Gặp sự nâng đỡ của người đàn bà đã có chồng
+Gặp SĨ TRẮNG N : Nên dè dặt theo đuổi của người đàn bà si tình | Có gấu ó với người láng giềng
+Gặp TƯỢNG TRẮNG N : Thất một vụ kiện nhưng được an ủi bằng một số tiền | Tổn thương danh dự
+Gặp XE TRẮNG N : Chịu sự thiệt thòi nhưng phải cam phận | Môi giới bất lợi
+Gặp PHÁO TRẮNG N : Vượt mọi trở ngại thành công gần kề | Được tin vui về việc làm
+Gặp NGỰA TRẮNG N : Đừng xem thường lời khuyên của người bạn | Giữa tình và danh dự cần chọn một
+Gặp CHỐT TRẮNG N : Qua rồi cơn mê nên thức tỉnh | Dịp may tình cờ
+5. PHÁO TRẮNG Đ :
+Gặp TƯỚNG TRẮNG N : Nên tránh mọi hội họp bất lợi | Có tang thương biến đổi
+Gặp SĨ TRẮNG N : Thua trí một kẻ không xứng đáng | Thất bại đau thương trong vụ kiện
+Gặp TƯỢNG TRẮNG N : Kẻ thù trở thành bạn | Được sự che chở của quý nhân, người có địa vị ở trên
+Gặp XE TRẮNG N : Nguy hiểm cạm bẫy giăng mắc khắp nơi | Thắng lợi sau cùng trước một địch thủ lợi hại
+Gặp PHÁO TRẮNG N :
+" Tiếng lành đồn xa, quý nhân đem tin thắng lợi tới " | " Hỷ sự trùng phùng, mọi mong cầu về danh lộc đều xứng ý toại lòng ".
+Gặp NGỰA TRẮNG N : Phòng sự nguy hiểm cho con cái | Có kẻ tới gây sự
+Gặp CHỐT TRẮNG N : Tổn thương về duyên nợ | Bị chạm đến tự ái
+6. NGỰA TRẮNG Đ :
+Gặp TƯỚNG TRẮNG N : Đừng giao phó tiền bạc cho ai | Tốn công còn mất của
+Gặp SĨ TRẮNG N : Bực bội vì sự hăm dọa | Đừng tiết lộ với ai về công việc đang dự trù
+Gặp TƯỢNG TRẮNG N : Bị người đàn bà ghen tuông sỉ vả | Câu chuyện qua đường sẽ bị hậu quả
+Gặp XE TRẮNG N : Phòng chuyện bé xé ra chuyện to | Thành công nhỏ trong công việc
+Gặp PHÁO TRẮNG N : Được tin bất ngờ về duyên nợ | Có quà tặng
+Gặp NGỰA TRẮNG N : Người bạn ích kỷ tìm cách hại ngầm | Đau đớn vì thương người kết quả hại cho mình
+Gặp CHỐT TRẮNG N : Tức giận có thể đổ máu | Kẻ gây hấn đã gục ngã
+7. CHỐT TRẮNG Đ :
+Gặp TƯỚNG TRẮNG N : Được sự che chở nhiều hạnh phúc | Nhận được tin, thư tình
+Gặp SĨ TRẮNG N : Người bạn gái thân yêu vừa nằm xuống | Mất người bạn đường mất cả hy vọng
+Gặp TƯỢNG TRẮNG N : Tâm trí điên đảo vì kẻ ác tâm | Đừng quá nông nổi mà thua thiệt
+Gặp XE TRẮNG N : Bị bỏ rơi sau khi đã lợi dụng | Buồn rầu vì sự lợi dụng của gia đình
+Gặp PHÁO TRẮNG N : Có xâu xé vì quyền lợi | Sự buồn khổ sắp qua
+Gặp NGỰA TRẮNG N : Phòng bị lôi cuốn trong việc mờ ám | Tin đột ngột về tiền bạc
+Gặp CHỐT TRẮNG N : Được sự giúp đỡ nhỏ của người bạn gái nghèo | Có may mắn về việc làm
+📊 DATA CHUẨN: NHÓM MÀU ĐỎ (PHẦN CUỐI FILE SỐ 5)
+1. TƯỚNG ĐỎ Đ :
+Gặp TƯỚNG ĐỎ N : Nên bước thêm một bước để đón cuộc hôn nhân tốt đẹp | Do dự sẽ mất cơ hội tốt
+Gặp SĨ ĐỎ N : Người đàn bà ganh tị trở lại giúp đỡ mình | Vui duyên mới nhưng không bền
+Gặp TƯỢNG ĐỎ N : Tình qua đường chỉ là tình đầu môi chót lưỡi | Tình đi trước hơn tiền đi trước
+Gặp XE ĐỎ N : Hy vọng được thành tựu | Mọi hứa hẹn đều bị thải hồi
+Gặp PHÁO ĐỎ N : Kết thân với người đàn bà quý phái | Người bạn đường chân thật
+Gặp NGỰA ĐỎ N : Của hồi môn đi liền với hẹn ước | Cô gái đẹp lòng đẹp dạ
+Gặp CHỐT ĐỎ N : Bội bạc là thói thường ray rứt làm gì | Phòng kẻ đến sau lại có trước
+2. SĨ ĐỎ Đ :
+Gặp TƯỚNG ĐỎ N : Se duyên cùng người bạn cũ | Buồn thoáng qua
+Gặp SĨ ĐỎ N : Thắng kẻ thù bằng vụ kiện | Khổ tâm vì hy vọng
+Gặp TƯỢNG ĐỎ N : Tơ lòng rối như lưới nhện | Đề phòng sự quyến rũ nguy hiểm
+Gặp XE ĐỎ N : Gặp người tình cờ trở thành bạn bè hoặc nhân tình | Khổ tâm vì hoàn cảnh của người yêu
+Gặp PHÁO ĐỎ N : Dứt bỏ không đành, tiến tới khó khăn | Ghen tuông lôi cuốn đến tụng đình
+Gặp NGỰA ĐỎ N : Bị chia sẻ tình yêu | Người đàn bà trắc nết quấy phá
+Gặp CHỐT ĐỎ N : Buồn rầu vì câu môn đăng hộ đối | Hôn nhân bị ngưng trệ
+3. TƯỢNG ĐỎ Đ :
+Gặp TƯỚNG ĐỎ N : Bị vu khống vì chuyện tình | Đau thương vì người yêu cũ đã ra đi vĩnh viễn
+Gặp SĨ ĐỎ N : Hôn nhân đổ vỡ vì ảnh hưởng của gia đình | Có sự họp mặt với người bạn gái
+Gặp TƯỢNG ĐỎ N : Thất bại trên mặt trận tình | Ghen bóng ghen gió đôi khi cũng tai hại
+Gặp XE ĐỎ N : Khám phá được sự phản bội | Bị hăm dọa vì cuộc tình
+Gặp PHÁO ĐỎ N : Xấu lá xấu nem thói thường là vậy | Phòng bị ghen ngược
+Gặp NGỰA ĐỎ N : Vì quá tin mà lỡ mất cuộc đời | Nhận được tin, thư tình
+Gặp CHỐT ĐỎ N : Vui vẻ mọi mặt trong gia đình | Sắp có người bạn đến thăm
+4. XE ĐỎ Đ :
+Gặp TƯỚNG ĐỎ N : Xứng lứa vừa đôi nhưng khó kết hợp | Tính tình tráo trở khó lường
+Gặp SĨ ĐỎ N : Người đàn ông nguy hiểm ngầm hại mình muốn xen vào chuyện tình | Dĩ vãng là đống tro tàn vụng về
+Gặp TƯỢNG ĐỎ N : Chuyện vui vừa dứt chuyện buồn đến sau | Ân tình não nuột
+Gặp XE ĐỎ N : Có tin vui chuyện sinh nở | Sau cơn sóng gió mọi chuyện đều yên ổn
+Gặp PHÁO ĐỎ N : Có hục hặc trong gia đình | Tham vọng nguy hiểm
+Gặp NGỰA ĐỎ N : Tan nát sau cuộc cãi vã | Hôn nhân không đồng lứa tuổi
+Gặp CHỐT ĐỎ N : Điên đảo vì người đàn bà trắc nết | Mang nhiều tai tiếng vì yêu
+5. PHÁO ĐỎ Đ :
+Gặp TƯỚNG ĐỎ N : Kết duyên với người đàn bà góa bụa | Tủi phận vì bị bỏ rơi
+Gặp SĨ ĐỎ N : Vui duyên mới, phụ nghĩa xưa | Chồng hờ vợ tạm nên chấm dứt
+Gặp TƯỢNG ĐỎ N : Gặp tình địch lợi hại | Chần chờ sẽ bị phỏng tay trên
+Gặp XE ĐỎ N : Có ngoại tình | Nguy hiểm do can thiệp về hôn nhân
+Gặp PHÁO ĐỎ N : Dứt áo ra đi vì hạnh phúc nát tan | Tin vui về con cái
+Gặp NGỰA ĐỎ N : Có người bạn đề nghị cuộc hôn nhân | Nhờ người bạn gái tốt mà hôn nhân thành tựu
+Gặp CHỐT ĐỎ N : Phòng có chửa hoang | Gặp người con gái mất trinh
+6. NGỰA ĐỎ Đ :
+Gặp TƯỚNG ĐỎ N : Kết hôn với người đàn bà góa giàu có | Vượt mọi sự trở ngại tiến đến hôn nhân
+Gặp SĨ ĐỎ N : Cẩn thận trong việc lựa chọn | Tình yêu không hạnh phúc
+Gặp TƯỢNG ĐỎ N : Sự ruồng rẫy vì hiểu lầm | Quyền lợi bị va chạm vì chuyện yêu
+Gặp XE ĐỎ N : Tình duyên bất ngờ trong đùa cợt | Gặp người đàn bà hung dữ
+Gặp PHÁO ĐỎ N : Hôn nhân kéo dài vì bị ngăn cản | Tình duyên bị ép uổng
+Gặp NGỰA ĐỎ N : Buồn rầu vì thân phận hẩm hiu | Người bạn gái chung tình còn e ấp làm gì
+Gặp CHỐT ĐỎ N : Sung sướng vì được yêu bất ngờ | Khám phá người yêu đang đeo đuổi
+7. CHỐT ĐỎ Đ :
+Gặp TƯỚNG ĐỎ N : Chấm dứt sự hiểu lầm nhưng đã đổ vỡ | Người yêu đã sang ngang
+Gặp SĨ ĐỎ N : Tình đầu thiếu hạnh phúc | Buồn vì sự dang dở
+Gặp TƯỢNG ĐỎ N : Càng suy nghĩ càng thấy đau đớn | Chữ trinh đáng giá ngàn vàng
+Gặp XE ĐỎ N : Bất hạnh vì cảnh cơ hàn | Chung tình ở đầu môi chót lưỡi
+Gặp PHÁO ĐỎ N : Tiền mạnh hơn tình | Có tranh chấp vì hôn nhân
+Gặp NGỰA ĐỎ N : Tình ngang trái vì trót yêu người trong thân tộc | Yêu lầm chọn nhầm gỡ sao ra
+Gặp CHỐT ĐỎ N : Nhận được tin tức, thư tình từ nơi xa xôi | Duyên hạnh ngộ chờ tin nhạn đưa sang
+    `;
+
+// ══════════════════════════════════════════════════════════
+//  findData05 — SỬA: dùng getKyHieu() thay vì includes("Đ")
+//  để tránh nhầm "Đ" trong "ĐỎ"
+// ══════════════════════════════════════════════════════════
+function findData05(laChu, laGap, gapNamBenPhai) {
+    const db = DATA_FILE_05.split('\n');
+    let currentChuBlock = "";
+
+    // Lấy tên base (không kèm ký hiệu) rồi uppercase để so khớp
+    const targetChu = getBaseName(laChu).toUpperCase().trim();
+    const targetGap = "GẶP " + getBaseName(laGap).toUpperCase().trim();
+
+    for (let i = 0; i < db.length; i++) {
+        let row = db[i].trim().toUpperCase();
+        if (!row) continue;
+
+        // Dòng header lá chủ: chứa ":" nhưng không bắt đầu bằng "GẶP"
+        if (row.includes(":") && !row.startsWith("GẶP")) {
+            if (row.includes(targetChu)) { currentChuBlock = targetChu; continue; }
+            else { currentChuBlock = ""; }
+        }
+
+        // Dòng data
+        if (currentChuBlock === targetChu && row.startsWith(targetGap)) {
+            let textHau = db[i].split(":").slice(1).join(":"); // lấy phần sau ":" đầu tiên
+            let ve = textHau.split("|");
+            if (ve.length >= 2) return gapNamBenPhai ? ve[1].trim() : ve[0].trim();
+            else return ve[0].trim();
+        }
+    }
+    return null;
+}
+
+// ══════════════════════════════════════════════════════════
+//  thucHienTruyVan — SỬA LOGIC HOÀN TOÀN
+//
+//  Với mỗi cặp (A, B):
+//  Bước 1: Xác định vai trò theo ký hiệu
+//    - A=Đ, B=N → lá A làm chủ, B đi kèm bên PHẢI A → lấy vế PHẢI (index 1)
+//    - B=Đ, A=N → lá B làm chủ, A đi kèm bên TRÁI B → lấy vế TRÁI (index 0)
+//  Bước 2: Nếu không tìm được (cả 2 cùng Đ, cùng N, hoặc miss):
+//    → Thử lá 2 làm chủ, lá 1 đi kèm
+//      · Lá 1 nằm bên TRÁI lá 2 → lấy vế TRÁI (index 0)
+//      · (đổi vai: findData05(B, A, false))
+// ══════════════════════════════════════════════════════════
+function thucHienTruyVan() {
+    // Correct tất cả 4 form trước khi tra
+    correctField('f1', null);
+    correctField('f2', 'f1');
+    correctField('f3', null);
+    correctField('f4', 'f3');
+
+    const la = [
+        document.getElementById('f1').value.trim(),
+        document.getElementById('f2').value.trim(),
+        document.getElementById('f3').value.trim(),
+        document.getElementById('f4').value.trim()
+    ];
+
+    let ketQua = [];
+
+    // Chỉ xử lý 2 cặp: (la[0],la[1]) và (la[2],la[3])
+    const capDoi = [[la[0], la[1], 1], [la[2], la[3], 2]];
+
+    for (const [A, B, soCapHienThi] of capDoi) {
+        if (!A || !B) continue;
+
+        const khA = getKyHieu(A);
+        const khB = getKyHieu(B);
+
+        let result = null;
+        let moTaCach = "";
+
+        // ── Bước 1: lá 1 làm chủ ──
+        if (khA === 'Đ' && khB === 'N') {
+            // A chủ, B bên phải → vế PHẢI
+            result = findData05(A, B, true);
+            moTaCach = `Lá ${soCapHienThi*2-1} (${A}) làm chủ — lấy vế phải`;
+        } else if (khB === 'Đ' && khA === 'N') {
+            // B chủ, A bên trái B → vế TRÁI
+            result = findData05(B, A, false);
+            moTaCach = `Lá ${soCapHienThi*2} (${B}) làm chủ — lấy vế trái`;
+        }
+
+        // ── Bước 2: Nếu chưa có result, thử lá 2 làm chủ (fallback) ──
+        if (!result) {
+            // B làm chủ, A đi kèm nằm bên TRÁI B → vế TRÁI (false)
+            result = findData05(B, A, false);
+            if (result) {
+                moTaCach = `Lá ${soCapHienThi*2} (${B}) làm chủ [fallback] — lấy vế trái`;
+            }
+        }
+
+        // ── Bước 3: Nếu vẫn không có, thử thêm A làm chủ B bên trái (đảo vế) ──
+        if (!result) {
+            result = findData05(A, B, false);
+            if (result) {
+                moTaCach = `Lá ${soCapHienThi*2-1} (${A}) làm chủ [fallback vế trái]`;
+            }
+        }
+
+        if (result) {
+            ketQua.push(`Cặp ${soCapHienThi}  (${A} — ${B})\n➤ ${result}`);
+        } else {
+            ketQua.push(`Cặp ${soCapHienThi}  (${A} — ${B})\n⚠ Không tìm thấy — kiểm tra lại định dạng`);
+        }
+    }
+
+    document.getElementById('output').innerText = ketQua.join("\n\n────────────────────\n\n");
+}
+
+function copyKetQua() {
+    const text = document.getElementById('output').innerText;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("✔ Đã sao chép!");
+    }).catch(() => {
+        const t = document.createElement('textarea');
+        t.value = text;
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
+        alert("✔ Đã sao chép!");
+    });
+}
+</script>
+</body>
+</html>
