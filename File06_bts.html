@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Trích Xuất Ý Nghĩa Lá Bài - File 06</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #f5f0e8;
+      --card: #fffdf7;
+      --primary: #3d2b1f;
+      --accent: #8b5e3c;
+      --accent2: #c49a6c;
+      --border: #d9cdb8;
+      --result-bg: #fdf8f0;
+      --error: #7a2020;
+      --error-bg: #fff0f0;
+      --shadow: 0 4px 24px rgba(61,43,31,0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 28px 16px 48px;
+      color: var(--primary);
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 5vw, 34px);
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+    .page-sub {
+      text-align: center;
+      color: var(--accent);
+      font-size: 15px;
+      margin-bottom: 36px;
+      font-style: italic;
+    }
+
+    .wrapper { max-width: 720px; margin: auto; }
+
+    .section {
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 32px;
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: #fff8ee;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .section-badge {
+      background: var(--accent2);
+      color: var(--primary);
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .section-rule {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-top: 2px;
+      font-style: italic;
+    }
+
+    .form-area { padding: 22px 24px 24px; }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 7px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 13px 16px;
+      font-size: 18px;
+      font-family: 'Source Sans 3', sans-serif;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: #fdfaf4;
+      color: var(--primary);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: var(--accent); background: #fff; }
+    input[type="text"]::placeholder { color: #bfae98; font-size: 16px; }
+
+    /* Suggestion popup */
+    .suggest-box {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      z-index: 100;
+      background: #fffdf7;
+      border: 2px solid var(--accent2);
+      border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(61,43,31,0.15);
+      display: none;
+      overflow: hidden;
+    }
+    .suggest-box.show { display: block; }
+    .suggest-label {
+      font-size: 12px;
+      color: var(--accent);
+      padding: 8px 14px 4px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .suggest-btn {
+      display: block;
+      width: 100%;
+      padding: 10px 18px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Source Sans 3', sans-serif;
+      background: none;
+      border: none;
+      border-top: 1px solid var(--border);
+      cursor: pointer;
+      text-align: left;
+      color: var(--primary);
+      transition: background 0.15s;
+    }
+    .suggest-btn:first-of-type { border-top: none; }
+    .suggest-btn:hover { background: var(--result-bg); color: var(--accent); }
+
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+
+    button {
+      padding: 13px 22px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Source Sans 3', sans-serif;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.1s, box-shadow 0.18s;
+      letter-spacing: 0.3px;
+    }
+    button:active { transform: scale(0.97); }
+
+    .btn-find {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff8ee;
+      box-shadow: 0 2px 10px rgba(61,43,31,0.18);
+    }
+    .btn-find:hover { box-shadow: 0 4px 18px rgba(61,43,31,0.28); }
+
+    .btn-copy {
+      background: var(--result-bg);
+      color: var(--accent);
+      border: 1.5px solid var(--accent2);
+    }
+    .btn-copy:hover { background: var(--accent2); color: #fff; }
+
+    .result {
+      margin-top: 20px;
+      padding: 18px 20px;
+      background: var(--result-bg);
+      border-left: 5px solid var(--accent2);
+      font-size: 18px;
+      line-height: 1.7;
+      border-radius: 10px;
+      min-height: 56px;
+      display: none;
+      white-space: pre-wrap;
+      color: var(--primary);
+    }
+    .result.show { display: block; }
+    .result.error {
+      border-left-color: var(--error);
+      background: var(--error-bg);
+      color: var(--error);
+      font-size: 15px;
+    }
+    .result strong { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--accent); display: block; margin-bottom: 8px; }
+    .meaning-text { font-size: 19px; font-weight: 500; }
+
+    .divider { border: none; border-top: 1.5px solid var(--border); margin: 0 24px 20px; }
+
+    @media (max-width: 480px) {
+      body { padding: 16px 8px 40px; }
+      .form-area { padding: 16px; }
+      .section-header { padding: 14px 16px; }
+      input[type="text"] { font-size: 16px; }
+      .meaning-text { font-size: 17px; }
+      .btn-row { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <h1 class="page-title">✦ Trích Xuất Ý Nghĩa Lá Bài ✦</h1>
+  <p class="page-sub">Nhập đúng chuẩn: <em>Số &nbsp;TÊN_LÁ &nbsp;MÀU &nbsp;Đ/N</em></p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge">1</div>
+      <div>
+        <div class="section-title">4 lá cùng vị trí — Tình huống 4-0</div>
+        <div class="section-rule">Form 1: 4 lá &nbsp;·&nbsp; Form 2: để trống</div>
+      </div>
+    </div>
+    <div class="form-area">
+      <label>Form 1</label>
+      <div class="input-wrap">
+        <input type="text" id="f1_s1" placeholder="Ví dụ: 4 TƯỚNG XANH Đ" oninput="handleInput(this,1,1)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f1_s1">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s1','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s1','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <label>Form 2 (để trống)</label>
+      <div class="input-wrap">
+        <input type="text" id="f2_s1" placeholder="Để trống" oninput="handleInput(this,2,1)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f2_s1">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s1','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s1','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-find" onclick="runSection(1)">🔍 TÌM Ý NGHĨA</button>
+        <button class="btn-copy" onclick="copyResult(1)">📋 SAO CHÉP</button>
+      </div>
+      <div id="result_s1" class="result"></div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge">2</div>
+      <div>
+        <div class="section-title">3 lá + 1 lá khác vị trí — Tình huống 3-1</div>
+        <div class="section-rule">Form 1: 3 lá &nbsp;·&nbsp; Form 2: 1 lá (khác Đ/N)</div>
+      </div>
+    </div>
+    <div class="form-area">
+      <label>Form 1 (3 lá)</label>
+      <div class="input-wrap">
+        <input type="text" id="f1_s2" placeholder="Ví dụ: 3 NGỰA XANH Đ" oninput="handleInput(this,1,2)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f1_s2">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s2','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s2','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <label>Form 2 (1 lá — khác vị trí)</label>
+      <div class="input-wrap">
+        <input type="text" id="f2_s2" placeholder="Ví dụ: 1 NGỰA XANH N" oninput="handleInput(this,2,2)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f2_s2">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s2','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s2','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-find" onclick="runSection(2)">🔍 TÌM Ý NGHĨA</button>
+        <button class="btn-copy" onclick="copyResult(2)">📋 SAO CHÉP</button>
+      </div>
+      <div id="result_s2" class="result"></div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge">3</div>
+      <div>
+        <div class="section-title">3 lá cùng vị trí — Tình huống 3-0</div>
+        <div class="section-rule">Form 1: 3 lá &nbsp;·&nbsp; Form 2: để trống</div>
+      </div>
+    </div>
+    <div class="form-area">
+      <label>Form 1</label>
+      <div class="input-wrap">
+        <input type="text" id="f1_s3" placeholder="Ví dụ: 3 TƯỢNG VÀNG Đ" oninput="handleInput(this,1,3)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f1_s3">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s3','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s3','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <label>Form 2 (để trống)</label>
+      <div class="input-wrap">
+        <input type="text" id="f2_s3" placeholder="Để trống" oninput="handleInput(this,2,3)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f2_s3">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s3','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s3','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-find" onclick="runSection(3)">🔍 TÌM Ý NGHĨA</button>
+        <button class="btn-copy" onclick="copyResult(3)">📋 SAO CHÉP</button>
+      </div>
+      <div id="result_s3" class="result"></div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge">4</div>
+      <div>
+        <div class="section-title">2 lá + 1 lá khác vị trí — Tình huống 2-1</div>
+        <div class="section-rule">Form 1: 2 lá &nbsp;·&nbsp; Form 2: 1 lá (khác Đ/N)</div>
+      </div>
+    </div>
+    <div class="form-area">
+      <label>Form 1 (2 lá)</label>
+      <div class="input-wrap">
+        <input type="text" id="f1_s4" placeholder="Ví dụ: 2 TƯỚNG VÀNG Đ" oninput="handleInput(this,1,4)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f1_s4">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s4','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s4','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <label>Form 2 (1 lá — khác vị trí)</label>
+      <div class="input-wrap">
+        <input type="text" id="f2_s4" placeholder="Ví dụ: 1 TƯỚNG VÀNG N" oninput="handleInput(this,2,4)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f2_s4">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s4','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s4','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-find" onclick="runSection(4)">🔍 TÌM Ý NGHĨA</button>
+        <button class="btn-copy" onclick="copyResult(4)">📋 SAO CHÉP</button>
+      </div>
+      <div id="result_s4" class="result"></div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge">5</div>
+      <div>
+        <div class="section-title">2 lá cùng vị trí — Tình huống 2-0</div>
+        <div class="section-rule">Form 1: 2 lá &nbsp;·&nbsp; Form 2: để trống</div>
+      </div>
+    </div>
+    <div class="form-area">
+      <label>Form 1</label>
+      <div class="input-wrap">
+        <input type="text" id="f1_s5" placeholder="Ví dụ: 2 CHỐT VÀNG Đ" oninput="handleInput(this,1,5)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f1_s5">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s5','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f1_s5','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <label>Form 2 (để trống)</label>
+      <div class="input-wrap">
+        <input type="text" id="f2_s5" placeholder="Để trống" oninput="handleInput(this,2,5)" onblur="hideAllSuggest()">
+        <div class="suggest-box" id="sug_f2_s5">
+          <div class="suggest-label">Chọn quân bài</div>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s5','TƯỚNG')">TƯỚNG</button>
+          <button class="suggest-btn" onmousedown="pickSuggest('f2_s5','TƯỢNG')">TƯỢNG</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-find" onclick="runSection(5)">🔍 TÌM Ý NGHĨA</button>
+        <button class="btn-copy" onclick="copyResult(5)">📋 SAO CHÉP</button>
+      </div>
+      <div id="result_s5" class="result"></div>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+// ==================== THƯ VIỆN DATA ====================
+const LIBRARY_DATA = `
+[SECTION=1]
+4 TƯỚNG XANH : Cuộc gặp gỡ tuyệt vời. Công danh không hẹn gặp gỡ mà nên | Được sự đỡ đầu đắc lực, danh phân kèm hôn nhân.
+4 TƯỚNG VÀNG : Sự nghiệp rỡ ràng lúc tuổi còn trẻ | Phá sản, tiêu tan địa vị.
+4 TƯỚNG TRẮNG : Mây mù bao phủ khắp vòm trời, tìm chỗ đục kẻo gặp giông bão | Địa vị được củng cố một cách kỳ lạ ngoài ý muốn.
+4 TƯỚNG ĐỎ : Hôn nhân giàu đầy dẫy hạnh phúc, sung túc và thịnh vượng | Đổ vỡ trong đêm tân hôn.
+4 SĨ XANH : Người đàn bà giàu, từ thiện nhưng không con, tận tình nâng đỡ như con ruột | Gặp sự đương đầu vô lý của người đàn bà đanh ác.
+4 SĨ VÀNG : Sự nghiệp to tát bỗng nhiên được đưa tận tay | Hoạnh tài to.
+4 SĨ TRẮNG : Ác mộng qua rồi, lo gì không hạnh phúc | Đoàn tụ gia đình, con cái nên danh.
+4 SĨ ĐỎ : Mọi chướng ngại đều lùi bước | Người bạn tốt tính chuyện vầy duyên cang lệ.
+4 TƯỢNG XANH : Nổi danh lừng lẫy | Địa vị sớm đến tay.
+4 TƯỢNG VÀNG : Tiền vào như nước lũ | Thành công vững vàng trong sự nghiệp.
+4 TƯỢNG TRẮNG : Tai họa bất ngờ khó tránh | Có quới nhơn bên mình.
+4 TƯỢNG ĐỎ : Hôn nhân rời rã vì hiểu lầm | Có cuộc thăm viếng bất ngờ.
+4 XE XANH : Hãnh diện vì đỗ cao | Phòng bị lôi cuốn vì ham địa vị.
+4 XE VÀNG : Sự nghiệp tăng trưởng | Sụp đổ không hay.
+4 XE TRẮNG : Thất kiện đau đớn | Thắng cuộc rỡ ràng.
+4 XE ĐỎ : Hạnh phúc gia đình, sanh con tốt | Có phản phúc trong thân tộc.
+4 PHÁO XANH : Tin vui từ xa về, mừng khấp khởi | Danh dự bị bôi nhọ.
+4 PHÁO VÀNG : Thắng một vụ tranh chấp tiền bạc | Gia tài lớn sẽ vào tay.
+4 PHÁO TRẮNG : Tang khó không thể tránh | Gặp thầy hay thuốc giỏi.
+4 PHÁO ĐỎ : Tiếng pháo vu quy đưa vào | Lệ cạn dòng, ân tình bạc bẽo.
+4 NGỰA XANH : Thi cử gặp may mắn | Lỡ một cơ hội, mất địa vị.
+4 NGỰA VÀNG : Thử mua số sẽ thấy bất ngờ | Tiền liền với tai.
+4 NGỰA TRẮNG : Phòng kẻ thù lợi hại | Kẻ bị nguyền rủa không còn nữa.
+4 NGỰA ĐỎ : Mừng bạn xưa đang mong đợi | Phản phúc, cạm bẫy, gian ác.
+4 CHỐT XANH : Tin vui vì được cất nhắc | Chán nản vì sự tranh giành địa vị.
+4 CHỐT VÀNG : Chuyện đang tính sắp thành tựu | Phòng kẻ ganh tị nguy hiểm.
+4 CHỐT TRẮNG : Khánh kiệt, bôn đào | Dừng lại kịp lúc.
+4 CHỐT ĐỎ : Đời lên hương sum vầy con cái | Triệu chứng có thai.
+[SECTION=2]
+4 TƯỚNG XANH : Công danh còn dài, chầm chậm tiến tới | Danh phận tốt nhưng bị hôn nhân chi phối.
+4 TƯỚNG VÀNG : Sự nghiệp đến chậm | Phòng mất của to.
+4 TƯỚNG TRẮNG : Nạn tai sẽ gặp quới nhơn trong phút chót | Cẩn thận kẻo danh dự bị bôi nhọ.
+4 TƯỚNG ĐỎ : Duyên thơ mộng nhưng gặp nhiều khổ sở khi nói đến hôn nhân | Đừng liều lĩnh nhắm mắt đưa tay mà ân hận suốt đời.
+4 SĨ XANH : Người ôm mộng đang chờ ngày nên danh | Ghen tuông làm hoen ố danh dự.
+4 SĨ VÀNG : Sự nghiệp bị chi phối | Phá hoại ngay trong gia đình.
+4 SĨ TRẮNG : Phòng bạo bệnh | Thanh toán được món nợ danh dự.
+4 SĨ ĐỎ : Đường còn xa, lắm nỗi gập ghềnh | Một bước tới hai bước lùi, thật khó nghĩ.
+4 TƯỢNG XANH : Thăng địa vị nhờ người đẹp | Thi cử nhiều rủi ít may.
+4 TƯỢNG VÀNG : Tiền vào cửa trước, tiền ra cửa sau | Công việc còn gặp vài ngưng trệ.
+4 TƯỢNG TRẮNG : Phòng khi qua suối, trèo cao | Bệnh xoàng.
+4 TƯỢNG ĐỎ : Người yêu đang có ý sang ngang | Sắp có người mang trầu cau đến.
+4 XE XANH : Có rắc rối trong gia đình, ảnh hưởng đến địa vị | Thay đổi một công việc.
+4 XE VÀNG : Món tiền đang mong, sắp sửa vào | Nên ngừng mọi hoạt động để tránh hậu quả.
+4 XE TRẮNG : Phòng âm mưu lừa tiền | Nên tránh xa những chỗ đông người.
+4 XE ĐỎ : Có sự tranh giành về tình duyên | Buồn rầu vì lỗi hẹn.
+4 PHÁO XANH : Đang khổ vì danh vọng | Lời đùa cợt trở thành sự thật.
+4 PHÁO VÀNG : Bị vu khống vì món tiền | Hứa hẹn khó thực hiện.
+4 PHÁO TRẮNG : Tin buồn từ nơi xa đưa về | Bệnh khó qua.
+4 PHÁO ĐỎ : Hôn nhân bị ngờ vực | Buồn rầu vì tính ngang ngược của người đàn bà.
+4 NGỰA XANH : Được tin về địa vị | Phòng ác ý của kẻ tiểu nhân.
+4 NGỰA VÀNG : Hoạnh tài nhỏ | Có sự tranh giành lợi hại về công việc.
+4 NGỰA TRẮNG : Ách ngoài đàng mang vào cổ | Đừng ham của rẻ.
+4 NGỰA ĐỎ : Hạnh phúc thoảng qua có thể điên đầu | Kẻ tình địch đang giăng lưới.
+4 CHỐT XANH : Khổ tâm vì con cái | Mang nhiều tai tiếng vì gia đình.
+4 CHỐT VÀNG : Tin vui về việc làm | Phòng mất sở.
+4 CHỐT TRẮNG : Đừng đi sâu vào trụy lạc | Đừng tin kẻ hay rủ ren.
+4 CHỐT ĐỎ : Phòng tranh tụng vì một chữ tình | Có cãi vã với người cận lân.
+[SECTION=3]
+3 TƯỚNG XANH : Thỏa mãn hoàn toàn trong ước vọng | Hy vọng đạt thành trong ngày gần.
+3 TƯỚNG VÀNG : Sự nghiệp được củng cố thêm | Tiền không mong mà được.
+3 TƯỚNG TRẮNG : Mọi sự hùn hạp nên chấm dứt | Sóng gió chỉ tạm dừng trong giai đoạn.
+3 TƯỚNG ĐỎ : Duyên thơ mộng nhưng phải trải nhiều cay đắng | Đừng nghĩ đến hôn nhân là thượng sách.
+3 SĨ XANH : Vài tia sáng về địa vị | Buồn rầu cũng vậy thôi.
+3 SĨ VÀNG : Tiền chưa phải tuyệt vọng, nên cố gắng thêm | Thất bại dồn dập, đừng liều lĩnh.
+3 SĨ TRẮNG : Thất bại ê chề trước cuộc tranh chấp | Đình hoãn lại kiện tụng để được yên thân.
+3 SĨ ĐỎ : Hôn nhân còn xa nên bằng lòng với hiện tại | Chậm trễ nhưng vẫn còn hy vọng.
+3 TƯỢNG XANH : Được một việc này mất một việc khác | Do dự là nơi xuống vũng lầy.
+3 TƯỢNG VÀNG : Tiền bạc vào tay nhờ xê dịch | Đừng mơ nhiều, khi việc chưa thành.
+3 TƯỢNG TRẮNG : Gặp kẻ đanh ác, đừng nên nói nghĩa nhân | Ba lần gượng lên ba lần chìm xuống.
+3 TƯỢNG ĐỎ : Duyên tình cờ thắm thía | Tốt hơn nên quay về với gia đình.
+3 XE XANH : Địa vị chưa tìm thấy | Công danh chỉ là thứ bánh vẽ.
+3 XE VÀNG : Cuộc du lịch thắng lợi | Chuyến đi gặp trắc trở, hao tốn tiền bạc.
+3 XE TRẮNG : Phòng tai nạn nguy hiểm | Sức khỏe hồi phục, tai qua nạn khỏi.
+3 XE ĐỎ : Được tin vui về bạn cũ | Bạn cũ mang đến phiền phức không đáng có.
+3 PHÁO XANH : Chấm dứt một mối thù | Hận thù dai dẳng, tiểu nhân rập rình.
+3 PHÁO VÀNG : Có kẻ rình rập, phòng mất của | Của cải dồi dào, không sợ kẻ gian.
+3 PHÁO TRẮNG : Lệ tràn đôi mi | Nỗi buồn vơi đi, tâm hồn thanh thản.
+3 PHÁO ĐỎ : Vu quy chưa hẳn hoàn toàn hạnh phúc | Hôn nhân vẹn tròn, trăm năm hạnh phúc.
+3 NGỰA XANH : Thành công nhỏ về một vấn đề | Thất bại đáng tiếc ngay phút cuối.
+3 NGỰA VÀNG : Kết quả đột ngột | Kết quả đến chậm, đòi hỏi kiên nhẫn.
+3 NGỰA TRẮNG : Mọi tiến thủ đều bất lợi | Càng xông xáo càng dễ gặp thời cơ.
+3 NGỰA ĐỎ : Hạnh phúc còn trải thêm giai đoạn thử thách | Tình cảm rạn nứt vì thiếu sự tin tưởng.
+3 CHỐT XANH : Có người đưa tin đến | Tin tức bị trì hoãn, chờ đợi trong mỏi mệt.
+3 CHỐT VÀNG : Lợi không đáng kể, đừng ham | Có xáo trộn vì lời châm biếm.
+3 CHỐT TRẮNG : Điều mong đợi đã tiêu tan | Buồn nhiều vì lương tâm cắn rứt.
+3 CHỐT ĐỎ : Gặp gỡ người bạn mới | Tình qua đường ở đầu môi chót lưỡi.
+[SECTION=4]
+3 TƯỚNG XANH : Có tin về công danh, lợi về tiền bạc | Dự tính bị đảo lộn bởi bàn tay đàn bà.
+3 TƯỚNG VÀNG : Vận may đã đến | Mất của không đáng kể.
+3 TƯỚNG TRẮNG : Người đàn ông phỉnh gạt tiền bạc | Có người đến đòi nợ, rắc rối.
+3 TƯỚNG ĐỎ : Hôn nhân thuận chiều | Có ganh tị về duyên nợ.
+3 SĨ XANH : Người đàn bà lợi dụng danh nghĩa mình | Tin mất ăn mất ngủ.
+3 SĨ VÀNG : Gặp khổ sở nơi xa lạ | Có kẻ lân la nguy hiểm.
+3 SĨ TRẮNG : Bất hạnh trong gia đình | Có người mời dự tiệc.
+3 SĨ ĐỎ : Tổn thương trầm trọng về tình duyên | Câu chuyện bất lợi với người thiếu nữ qua đường.
+3 TƯỢNG XANH : Thư nặc danh gây ngờ vực | Phải đương đầu với dã tâm độc ác.
+3 TƯỢNG VÀNG : Thưa kiện không đủ yếu tố nên hòa giải | Âm mưu về tình ái.
+3 TƯỢNG TRẮNG : Sức khỏe bị đe dọa | Người bạc tình ngầm ám hại.
+3 TƯỢNG ĐỎ : Đổ vỡ lúc sắp thành tựu | Mọi hoạt động môi giới đều hỏng.
+3 XE XANH : Người bạn tận tâm giúp đỡ | Thắng lợi giữa cơn sóng gió.
+3 XE VÀNG : Phòng bị lường gạt đồ vật | Đi xa mới có lợi.
+3 XE TRẮNG : Có hò hẹn về đêm | Có người mang thư đến.
+3 XE ĐỎ : Mọi lo liệu về hôn nhân đều bị chối từ | Tin tức sinh đẻ.
+3 PHÁO XANH : Được tin mừng về thi cử | Thắng được đối phương.
+3 PHÁO VÀNG : Công việc bị xáo trộn | Gặp khó khăn.
+3 PHÁO TRẮNG : Địa vị lung lay | Tang khó gần kề.
+3 PHÁO ĐỎ : Được thư tình | Quà yêu đương.
+3 NGỰA XANH : Có thay đổi vị trí | Thành công bấp bênh.
+3 NGỰA VÀNG : Sự liên kết không mang lợi lộc | Thất bại.
+3 NGỰA TRẮNG : Lôi thôi vì cuộc giao dịch | Chuyện kín bị phản bội.
+3 NGỰA ĐỎ : Phòng cạm bẫy ái tình | Tình duyên chia rẽ.
+3 CHỐT XANH : Nhận được tin bất an | Địa vị bị dòm ngó.
+3 CHỐT VÀNG : Thành công giả tạo | Dối trá trong việc hợp tác.
+3 CHỐT TRẮNG : Mất của lúc đi đường | Tai vạ đến bất ngờ.
+3 CHỐT ĐỎ : Tình cảm bị dao động | Có kẻ xỏ xiên về hôn nhân.
+[SECTION=5]
+2 TƯỚNG XANH : Cuộc giao thiệp nhiều hứa hẹn | Khổ lụy sau cuộc vui.
+2 TƯỚNG VÀNG : Gặp bạn mới | Có phiền phức trong công việc.
+2 TƯỚNG TRẮNG : Nguy cơ nặng nề | Nhiều khổ tâm.
+2 TƯỚNG ĐỎ : Kết quả vui vẻ về tình duyên | Hậu quả của cuộc ái ân thầm lén.
+2 SĨ XANH : Chấm dứt một mưu toan | Buồn bã liên miên.
+2 SĨ VÀNG : Hưởng gia tài hoặc tiền thưởng | Một kẻ xấu đi qua, một kẻ xấu khác đến.
+2 SĨ TRẮNG : Bất lợi mọi mặt | Khổ tâm vì gia đình.
+2 SĨ ĐỎ : Ý trung nhân nhiều thân thế và địa vị | Cô độc, buồn rầu vì tình.
+2 TƯỢNG XANH : Có cuộc vận động che chở | Hy vọng khó thành.
+2 TƯỢNG VÀNG : Có di chúc | Có sự chống đối về tài sản.
+2 TƯỢNG TRẮNG : Qua một khổ sở gặp một khổ sở khác | Tin, thư tuyệt giao.
+2 TƯỢNG ĐỎ : Tình cảm được xoa dịu | Tình duyên ngang trái.
+2 XE XANH : Có cuộc thăm viếng về địa vị | Tin không được may mắn về cuộc vận động.
+2 XE VÀNG : Tiền bạc vào bằng cuộc đen đỏ | Thất bại theo liền thành công.
+2 XE TRẮNG : Có tổn hại vì xấu bụng | Lợi không đáng kể.
+2 XE ĐỎ : Gặp người đẹp dễ mến | Nên để ý lời nịnh bợ.
+2 PHÁO XANH : Một cuộc hợp tác nhiều ý nghĩa | Một sự nguy ngập.
+2 PHÁO VÀNG : Có đề nghị về tiền bạc | Mất tiền hoặc của quý.
+2 PHÁO TRẮNG : Tiền cho vay hoặc cho mượn bị mất | Có thù nghịch.
+2 PHÁO ĐỎ : Có sanh con hoặc duyên mới | Giận dữ vì mắc lừa.
+2 NGỰA XANH : Có đề nghị hữu ích | Nhận được giấy tờ không hay.
+2 NGỰA VÀNG : Thịnh vượng nhờ sự giúp đỡ của người đàn bà | Chướng ngại trong công việc.
+2 NGỰA TRẮNG : Có cãi vã, gấu ó | Buồn tủi, rơi lệ căm hờn.
+2 NGỰA ĐỎ : Hạnh phúc ở tầm tay | Tình cảm sứt mẻ.
+2 CHỐT XANH : Tin tức chậm trễ | Lỡ một chuyến đò.
+2 CHỐT VÀNG : Lợi lộc đáng kể | Thất bại nhưng vẫn cứu kịp.
+2 CHỐT TRẮNG : Phá sản, khánh tận | Bất hạnh, tang khó, sụp đổ.
+2 CHỐT ĐỎ : Gặp gỡ bất ngờ nhiều hứa hẹn | Người yêu dứt áo ra đi.
+`;
+// =====================================================
+
+// ── Parse: tách data thành Map theo từng SECTION ──
+function buildSectionMap() {
+  const map = {};
+  const sectionSplitter = /\[SECTION=(\d+)\]/g;
+  let match;
+  const parts = [];
+
+  while ((match = sectionSplitter.exec(LIBRARY_DATA)) !== null) {
+    parts.push({ num: parseInt(match[1]), index: match.index });
+  }
+
+  for (let i = 0; i < parts.length; i++) {
+    const secNum = parts[i].num;
+    const start = parts[i].index;
+    const end = i + 1 < parts.length ? parts[i + 1].index : LIBRARY_DATA.length;
+    const block = LIBRARY_DATA.slice(start, end);
+
+    map[secNum] = {};
+
+    const lineRe = /^(\d+\s+[A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯẠ-Ỹ\s]+?)\s*:\s*([^|\n]+?)\s*\|\s*([^\n]+)/gm;
+    let lm;
+    while ((lm = lineRe.exec(block)) !== null) {
+      const key = lm[1].trim();
+      map[secNum][key] = {
+        left: lm[2].trim(),
+        right: lm[3].trim()
+      };
+    }
+  }
+  return map;
+}
+
+const SECTION_MAP = buildSectionMap();
+
+// ── Normalize input ──
+function normalizeInput(str) {
+  if (!str || !str.trim()) return null;
+  let s = str.trim().toUpperCase().replace(/\s+/g, ' ');
+  const match = s.match(/^(\d+)\s+([\p{L}\s]+?)\s+(XANH|VÀNG|TRẮNG|ĐỎ)\s+(Đ|N)$/u);
+  if (!match) return null;
+  return {
+    count: parseInt(match[1]),
+    name: match[2].trim(),
+    color: match[3].trim(),
+    fullName: match[2].trim() + ' ' + match[3].trim(),
+    position: match[4]
+  };
+}
+
+// ── Tra cứu trong đúng SECTION ──
+function findMeaning(sectionNum, prefixCount, fullName, useLeft) {
+  const key = `${prefixCount} ${fullName}`;
+  const sec = SECTION_MAP[sectionNum];
+  if (!sec) return `Không tìm thấy SECTION ${sectionNum} trong thư viện.`;
+
+  if (sec[key]) {
+    return useLeft ? sec[key].left : sec[key].right;
+  }
+
+  const keyNorm = key.replace(/\s+/g, ' ').trim();
+  for (const k of Object.keys(sec)) {
+    if (k.replace(/\s+/g, ' ').trim() === keyNorm) {
+      return useLeft ? sec[k].left : sec[k].right;
+    }
+  }
+
+  return `Không tìm thấy "${key}" trong SECTION ${sectionNum}.`;
+}
+
+// ── Hiển thị lỗi / kết quả ──
+function showError(sec, msg) {
+  const d = document.getElementById(`result_s${sec}`);
+  d.className = 'result show error';
+  d.textContent = '⚠️ ' + msg;
+}
+
+function showResult(sec, label, text) {
+  const d = document.getElementById(`result_s${sec}`);
+  d.className = 'result show';
+  d.innerHTML = `<strong>${label}</strong><span class="meaning-text">${text}</span>`;
+}
+
+// ── Logic chính từng SECTION ──
+function runSection(sec) {
+  const f1raw = document.getElementById(`f1_s${sec}`).value;
+  const f2raw = document.getElementById(`f2_s${sec}`).value;
+
+  const f1 = normalizeInput(f1raw);
+  const f2 = f2raw.trim() ? normalizeInput(f2raw) : null;
+
+  if (!f1) {
+    showError(sec, 'Form 1 sai định dạng! Chuẩn: Số TÊN_LÁ MÀU Đ/N (ví dụ: 4 TƯỚNG XANH Đ)');
+    return;
+  }
+
+  if (f2 && f1.fullName !== f2.fullName) {
+    showError(sec, 'Hai form phải cùng tên lá và cùng màu!');
+    return;
+  }
+
+  if (f2 && f1.position === f2.position) {
+    showError(sec, 'Form 2 phải có vị trí khác form 1 (Đ ↔ N)!');
+    return;
+  }
+
+  const c1 = f1.count;
+  const c2 = f2 ? f2.count : 0;
+
+  if (sec === 1) {
+    if (c1 !== 4 || c2 !== 0) { showError(sec, 'SECTION 1 cần Form 1 = 4 lá, Form 2 = trống.'); return; }
+    const useLeft = f1.position === 'Đ';
+    const meaning = findMeaning(1, 4, f1.fullName, useLeft);
+    showResult(sec, `SECTION 1 — 4 ${f1.fullName} ${f1.position === 'Đ' ? '(Đứng)' : '(Ngược)'}`, meaning);
+    return;
+  }
+
+  if (sec === 2) {
+    if (c1 !== 3 || c2 !== 1) { showError(sec, 'SECTION 2 cần Form 1 = 3 lá, Form 2 = 1 lá (khác vị trí).'); return; }
+    const useLeft = f1.position === 'Đ';
+    const meaning = findMeaning(2, 4, f1.fullName, useLeft);
+    showResult(sec, `SECTION 2 — 3${f1.position} + 1${f2.position} ${f1.fullName}`, meaning);
+    return;
+  }
+
+  if (sec === 3) {
+    if (c1 !== 3 || c2 !== 0) { showError(sec, 'SECTION 3 cần Form 1 = 3 lá, Form 2 = trống.'); return; }
+    const useLeft = f1.position === 'Đ';
+    const meaning = findMeaning(3, 3, f1.fullName, useLeft);
+    showResult(sec, `SECTION 3 — 3 ${f1.fullName} ${f1.position === 'Đ' ? '(Đứng)' : '(Ngược)'}`, meaning);
+    return;
+  }
+
+  if (sec === 4) {
+    if (c1 !== 2 || c2 !== 1) { showError(sec, 'SECTION 4 cần Form 1 = 2 lá, Form 2 = 1 lá (khác vị trí).'); return; }
+    const useLeft = f1.position === 'Đ';
+    const meaning = findMeaning(4, 3, f1.fullName, useLeft);
+    showResult(sec, `SECTION 4 — 2${f1.position} + 1${f2.position} ${f1.fullName}`, meaning);
+    return;
+  }
+
+  if (sec === 5) {
+    if (c1 !== 2 || c2 !== 0) { showError(sec, 'SECTION 5 cần Form 1 = 2 lá, Form 2 = trống.'); return; }
+    const useLeft = f1.position === 'Đ';
+    const meaning = findMeaning(5, 2, f1.fullName, useLeft);
+    showResult(sec, `SECTION 5 — 2 ${f1.fullName} ${f1.position === 'Đ' ? '(Đứng)' : '(Ngược)'}`, meaning);
+    return;
+  }
+}
+
+// ── Sao chép ──
+function copyResult(sec) {
+  const d = document.getElementById(`result_s${sec}`);
+  if (!d.classList.contains('show') || d.classList.contains('error')) {
+    showCopyFeedback(sec, false, 'Chưa có kết quả để sao chép!');
+    return;
+  }
+  const span = d.querySelector('.meaning-text');
+  const text = (span ? span.textContent : d.textContent).trim();
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => showCopyFeedback(sec, true))
+      .catch(() => fallbackCopy(sec, text));
+  } else {
+    fallbackCopy(sec, text);
+  }
+}
+
+function fallbackCopy(sec, text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    showCopyFeedback(sec, ok);
+  } catch(e) {
+    showCopyFeedback(sec, false, 'Trình duyệt không hỗ trợ sao chép tự động.');
+  }
+}
+
+function showCopyFeedback(sec, success, msg) {
+  const btn = document.querySelector(`[onclick="copyResult(${sec})"]`);
+  if (!btn) return;
+  const original = btn.innerHTML;
+  btn.innerHTML = success ? '✅ Đã sao chép!' : `⚠️ ${msg || 'Lỗi sao chép'}`;
+  btn.style.background = success ? '#c8f0d8' : '#ffe0e0';
+  btn.style.color = success ? '#1a6b3a' : '#7a2020';
+  setTimeout(() => {
+    btn.innerHTML = original;
+    btn.style.background = '';
+    btn.style.color = '';
+  }, 2000);
+}
+
+// =====================================================
+// ══════════ AUTO-FIX INPUT ENGINE ══════════
+// =====================================================
+
+// Cấu trúc cố định: [0]=Số  [1]=TênQuân  [2]=Màu  [3]=Đ/N
+// Fix theo đúng vị trí, không đoán nhầm vị trí này sang vị trí khác.
+
+const VALID_PIECES = ['TƯỚNG', 'SĨ', 'TƯỢNG', 'XE', 'PHÁO', 'NGỰA', 'CHỐT'];
+const VALID_COLORS = ['XANH', 'VÀNG', 'TRẮNG', 'ĐỎ'];
+
+const CORRECT_COUNTS = {
+  1: { f1: 4, f2: null },
+  2: { f1: 3, f2: 1 },
+  3: { f1: 3, f2: null },
+  4: { f1: 2, f2: 1 },
+  5: { f1: 2, f2: null }
+};
+
+// ── Bỏ dấu tiếng Việt để so sánh fuzzy ──
+function removeTones(str) {
+  return str
+    .replace(/[àáâãăạảấầẩẫậắằẳẵặ]/gi,'a')
+    .replace(/[èéêẹẻẽếềểễệ]/gi,'e')
+    .replace(/[ìíĩịỉ]/gi,'i')
+    .replace(/[òóôõơọỏốồổỗộớờởỡợ]/gi,'o')
+    .replace(/[ùúũưụủứừửữự]/gi,'u')
+    .replace(/[ỳýỹỵỷ]/gi,'y')
+    .replace(/[đ]/gi,'d')
+    .replace(/[ÀÁÂÃĂẠẢẤẦẨẪẬẮẰẲẴẶ]/g,'A')
+    .replace(/[ÈÉÊẸẺẼẾỀỂỄỆ]/g,'E')
+    .replace(/[ÌÍĨỊỈ]/g,'I')
+    .replace(/[ÒÓÔÕƠỌỎỐỒỔỖỘỚỜỞỠỢ]/g,'O')
+    .replace(/[ÙÚŨƯỤỦỨỪỬỮỰ]/g,'U')
+    .replace(/[ỲÝỸỴỶ]/g,'Y')
+    .replace(/[Đ]/g,'D');
+}
+
+// ── Levenshtein ──
+function editDistance(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m+1}, (_,i) =>
+    Array.from({length: n+1}, (_,j) => i===0 ? j : j===0 ? i : 0));
+  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// ── Vị trí [0]: Fix số ──
+function fixCount(token, expectedNum) {
+  if (!token) return expectedNum !== null ? String(expectedNum) : '';
+  // Nếu không phải số thì trả về số đúng
+  if (!/^\d+$/.test(token)) return expectedNum !== null ? String(expectedNum) : token;
+  // Nếu là số và có giá trị mong đợi → sửa thành đúng
+  if (expectedNum !== null) return String(expectedNum);
+  return token;
+}
+
+// ── Vị trí [1]: Fix tên quân ──
+// Trả về { result: string, ambiguous: bool }
+function fixPiece(token) {
+  if (!token) return { result: '', ambiguous: false };
+  const up = token.toUpperCase();
+  const t = removeTones(up);
+
+  // Khớp chính xác
+  if (VALID_PIECES.includes(up)) return { result: up, ambiguous: false };
+
+  // XE và SĨ đặc biệt (ngắn)
+  if (t === 'XE' || t === 'X') return { result: up.length >= 2 ? 'XE' : up, ambiguous: false };
+  if (t.startsWith('SI') || up.startsWith('SĨ')) return { result: t.length >= 2 ? 'SĨ' : up, ambiguous: false };
+
+  // PHÁO, NGỰA, CHỐT — từ 2 ký tự
+  if (t.startsWith('PH')) return { result: t.length >= 2 ? 'PHÁO' : up, ambiguous: false };
+  if (t.startsWith('NG')) return { result: t.length >= 2 ? 'NGỰA' : up, ambiguous: false };
+  if (t.startsWith('CH')) return { result: t.length >= 2 ? 'CHỐT' : up, ambiguous: false };
+
+  // TƯỚNG / TƯỢNG — cần ít nhất 3 ký tự để phân biệt
+  if (t.startsWith('TU') || up.startsWith('TƯ')) {
+    if (t.length < 3) return { result: up, ambiguous: false }; // chưa đủ, giữ nguyên
+    // Ký tự thứ 3 (index 2) phân biệt
+    const c3 = t[2];
+    if (c3 === 'O') {
+      // TUO... → xem ký tự thứ 4
+      if (t.length >= 4) {
+        const c4 = t[3];
+        // TƯỚNG không dấu: TUONG (N ở vị trí 4)
+        // TƯỢNG không dấu: TUONG (N ở vị trí 4) — giống nhau khi bỏ dấu!
+        // → phải dùng ký tự có dấu để phân biệt
+        const up4 = up[3]; // ký tự thứ 4 có dấu
+        if (up4 === 'Ớ' || up4 === 'Ơ') return { result: 'TƯỚNG', ambiguous: false };
+        if (up4 === 'Ợ' || up4 === 'Ọ') return { result: 'TƯỢNG', ambiguous: false };
+        // Nếu gõ không dấu thì ambiguous
+        return { result: up, ambiguous: true };
+      }
+      // Chỉ 3 ký tự TUO → ambiguous
+      return { result: up, ambiguous: true };
+    }
+    // TU + ký tự khác O → dùng edit distance
+  }
+
+  // Fallback edit distance (chỉ khi >= 3 ký tự)
+  if (t.length >= 3) {
+    let best = null, bestDist = 999, secondDist = 999;
+    for (const p of VALID_PIECES) {
+      const d = editDistance(t, removeTones(p));
+      if (d < bestDist) { secondDist = bestDist; bestDist = d; best = p; }
+      else if (d < secondDist) { secondDist = d; }
+    }
+    // Nếu khoảng cách đủ tốt và không mơ hồ
+    if (bestDist <= 2 && secondDist - bestDist >= 1) {
+      // Đặc biệt: nếu best là TƯỚNG hoặc TƯỢNG, cần kiểm tra thêm
+      if ((best === 'TƯỚNG' || best === 'TƯỢNG') && removeTones(best) === removeTones('TƯỚNG')) {
+        return { result: up, ambiguous: true };
+      }
+      return { result: best, ambiguous: false };
+    }
+    if (bestDist <= 2) return { result: up, ambiguous: false }; // giữ nguyên nếu mơ hồ
+  }
+
+  // Chưa đủ → giữ nguyên, không sửa
+  return { result: up, ambiguous: false };
+}
+
+// ── Vị trí [2]: Fix màu (chỉ fix khi >= 2 ký tự) ──
+function fixColor(token) {
+  if (!token) return { result: '', done: false };
+  const up = token.toUpperCase();
+  if (up.length < 2) return { result: up, done: false }; // chưa đủ 2 ký tự, không sửa
+
+  // Khớp chính xác
+  if (VALID_COLORS.includes(up)) return { result: up, done: true };
+
+  const t = removeTones(up);
+
+  // Nhận diện từ 2 ký tự đầu
+  if (t.startsWith('XA')) return { result: 'XANH', done: true };
+  if (t.startsWith('VA') || up.startsWith('VÀ')) return { result: 'VÀNG', done: true };
+  if (t.startsWith('TR')) return { result: 'TRẮNG', done: true };
+  // ĐỎ: D hoặc Đ — nhưng chỉ khi token ngắn (tránh nhầm với tên quân bắt đầu D)
+  if ((t.startsWith('DO') || up.startsWith('ĐỎ') || up.startsWith('Đ')) && up.length <= 4) {
+    return { result: 'ĐỎ', done: true };
+  }
+
+  // Fallback edit distance
+  let best = null, bestDist = 999;
+  for (const c of VALID_COLORS) {
+    const d = editDistance(t, removeTones(c));
+    if (d < bestDist) { bestDist = d; best = c; }
+  }
+  if (bestDist <= 2) return { result: best, done: true };
+
+  return { result: up, done: false };
+}
+
+// ── Vị trí [3]: Fix Đ/N ──
+function fixPosition(token) {
+  if (!token) return '';
+  const t = token.toUpperCase().trim();
+  if (t === 'Đ' || t === 'D') return 'Đ';
+  if (t === 'N' || t === 'M') return 'N';
+  return t; // giữ nguyên nếu không nhận ra
+}
+
+// ── Hiện/ẩn gợi ý ──
+function showSuggest(inputId) {
+  const box = document.getElementById('sug_' + inputId);
+  if (box) box.classList.add('show');
+}
+function hideSuggest(inputId) {
+  const box = document.getElementById('sug_' + inputId);
+  if (box) box.classList.remove('show');
+}
+function hideAllSuggest() {
+  document.querySelectorAll('.suggest-box').forEach(b => b.classList.remove('show'));
+}
+
+// ── User chọn TƯỚNG hoặc TƯỢNG từ popup ──
+function pickSuggest(inputId, piece) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  // Token [1] là tên quân → thay bằng piece đã chọn
+  const tokens = inp.value.toUpperCase().trim().split(/\s+/).filter(Boolean);
+  if (tokens.length >= 2) tokens[1] = piece;
+  inp.value = tokens.join(' ');
+  hideSuggest(inputId);
+  inp.focus();
+  // Đặt cursor về cuối
+  const len = inp.value.length;
+  try { inp.setSelectionRange(len, len); } catch(e){}
+}
+
+// ── Hàm xử lý input chính ──
+// Cấu trúc cố định theo vị trí: [0]=Số [1]=TênQuân [2]=Màu [3]=Đ/N
+function handleInput(inp, formNum, secNum) {
+  const inputId = inp.id;
+  hideSuggest(inputId);
+
+  // Lưu vị trí cursor trước khi sửa
+  const caretPos = inp.selectionStart;
+  const oldLen = inp.value.length;
+
+  // 1. Uppercase toàn bộ
+  let raw = inp.value.toUpperCase();
+
+  // 2. Tách token theo khoảng trắng
+  const tokens = raw.trim().split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) { inp.value = ''; return; }
+
+  const correctCount = CORRECT_COUNTS[secNum];
+  const expectedNum = formNum === 1 ? correctCount.f1 : correctCount.f2;
+
+  let out = [];
+  let ambiguous = false;
+
+  // Xử lý từng vị trí theo thứ tự cố định
+  // Vị trí 0: Số
+  if (tokens[0] !== undefined) {
+    out.push(fixCount(tokens[0], expectedNum));
+  }
+
+  // Vị trí 1: Tên quân — chỉ sửa khi user đã gõ xong token này
+  // (tức là đã có token tiếp theo hoặc token kết thúc bằng space)
+  if (tokens[1] !== undefined) {
+    const tokenDone = tokens.length > 2 || raw.endsWith(' ');
+    if (tokenDone) {
+      const { result, ambiguous: amb } = fixPiece(tokens[1]);
+      out.push(result);
+      if (amb) ambiguous = true;
+    } else {
+      // User đang gõ dở tên quân → giữ nguyên, chưa sửa
+      out.push(tokens[1]);
+    }
+  }
+
+  // Vị trí 2: Màu — chỉ sửa khi user đã gõ xong token này
+  if (tokens[2] !== undefined) {
+    const tokenDone = tokens.length > 3 || raw.endsWith(' ');
+    if (tokenDone) {
+      const { result } = fixColor(tokens[2]);
+      out.push(result);
+    } else {
+      // User đang gõ dở màu → giữ nguyên
+      out.push(tokens[2]);
+    }
+  }
+
+  // Vị trí 3: Đ/N
+  if (tokens[3] !== undefined) {
+    out.push(fixPosition(tokens[3]));
+  }
+
+  // Bỏ các token thừa từ vị trí 4 trở đi
+  // (không append)
+
+  // Rebuild — giữ trailing space nếu user đang gõ
+  let rebuilt = out.join(' ');
+  if (raw.endsWith(' ') && out.length < 4) rebuilt += ' ';
+
+  // Cập nhật value
+  inp.value = rebuilt;
+
+  // Khôi phục cursor
+  const newLen = inp.value.length;
+  const newCaret = Math.min(caretPos + (newLen - oldLen), newLen);
+  try { inp.setSelectionRange(newCaret, newCaret); } catch(e){}
+
+  // Hiện gợi ý TƯỚNG/TƯỢNG nếu cần
+  if (ambiguous) showSuggest(inputId);
+}
+</script>
+</body>
+</html>

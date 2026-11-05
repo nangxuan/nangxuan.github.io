@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HỆ THỐNG TRUY XUẤT CHUẨN ĐÚNG</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 10px; background: #f0f0f0; }
+        .container { max-width: 100%; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #b71c1c; font-size: 24px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; font-size: 20px; margin-bottom: 5px; color: #333; }
+        input {
+            width: 100%; padding: 16px; border: 3px solid #333; border-radius: 10px;
+            font-size: 22px; font-weight: bold; box-sizing: border-box; background: #fffde7;
+        }
+        input.ok { border-color: #2e7d32; background: #e8f5e9; }
+
+        /* ===== GỢI Ý AUTO-FILL ===== */
+        .sug { display: none; margin-top: 6px; border: 2px solid #1565c0; border-radius: 10px; overflow: hidden; background: #fff; }
+        .sug-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px; font-size: 20px; font-weight: bold; color: #0d47a1;
+            border-bottom: 1px solid #bbdefb; cursor: pointer;
+        }
+        .sug-item:last-child { border-bottom: none; }
+        .sug-item:active { background: #bbdefb; }
+        .sug-item small { font-size: 15px; color: #555; font-weight: normal; margin-left: 10px; text-align: right; }
+
+        #result-area {
+            margin-top: 20px; padding: 15px; border: 4px solid #b71c1c; border-radius: 10px;
+            min-height: 250px; white-space: pre-wrap; background: #fff;
+            font-size: 22px; line-height: 1.6; font-weight: bold; color: #000;
+        }
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        button {
+            padding: 20px; font-size: 22px; font-weight: bold; border: none;
+            border-radius: 10px; color: #fff; text-transform: uppercase;
+        }
+        .btn-run { background: #b71c1c; }
+        .btn-copy { background: #1565c0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>TRA CỨU THỐNG NHẤT</h2>
+
+    <div class="form-group"><label>Lá 1:</label><input type="text" class="card-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="vd: tuong xanh d"></div>
+    <div class="form-group"><label>Lá 2:</label><input type="text" class="card-input" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+    <div class="form-group"><label>Lá 3:</label><input type="text" class="card-input" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+    <div class="form-group"><label>Lá 4:</label><input type="text" class="card-input" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+
+    <div class="btn-group">
+        <button class="btn-run" onclick="extractData()">TRÍCH XUẤT DATA</button>
+        <button class="btn-copy" onclick="copyData()">SAO CHÉP KẾT QUẢ</button>
+    </div>
+
+    <div id="result-area"></div>
+</div>
+
+<script>
+    // DÁN DATA FILE 01 VÀO ĐÂY (GIỮA HAI DẤU ` )
+    const DATABASE = `
+CÁC LÁ BÀI TƯỚNG :
+
+1. TƯỚNG XANH :
+Quân bài Tướng chịu ảnh hưởng của Mộc Tinh,vị vua trị vì ở Thượng Đình,và dĩ nhiên vua lúc nào cũng có cả quyền hành trong tay,danh dự và nhất là lòng vị tha nếu là vị minh quân.
+Ngoài ra quân bài Tướng còn là người chỉ huy sáng suốt,tài ba,khôn khéo.Cho nên lá bài Tướng tượng trưng cho những hành vi cao đẹp của quý nhân có uy quyền.
+TƯỚNG XANH Đ : Lá TƯỚNG XANH Đứng là lá bài tuyệt vời trong mọi ao ước,xin xỏ về công danh,thi cử,tiến thân…hoặc mọi sự khơi mào cho công việc làm ăn trong bất kì ngành nghề nào.Mọi khuếch trương vừa mang lại danh dự vừa thu thập lợi lộc.
+Lá TƯỚNG XANH Đứng trong quẻ bài là 1 quý nhân đứng tuổi,nghiêm nghị,có uy quyền và có tấm lòng vị tha,tha thiết bảo vệ ,tiến cử và giúp đỡ về mọi mặt của người xin quẻ
+TƯỚNG XANH N : Lá TƯỚNG XANH Ngược đầu là viễn cảnh của mọi mưu tính sẽ thất bại,thất vọng vì bị lừa dối của người trên trước,tuy có uy quyền nhưng không đức độ.Ngoài ra còn báo hiệu cho sự xích mích giữa người xin quẻ với kẻ trên trước có thể có những phiền toái khó tránh.
+2. TƯỚNG VÀNG :
+Dù ở cương vị nào,Tướng cũng là người chỉ huy,còn có đức độ hay không lại là chuyện khác.
+Trong quẻ bài Tứ Sắc thì TƯỚNG VÀNG được đề cử tượng trưng cho quý nhân nhiều uy thế,nhiều ảnh hưởng,nhiều kinh nghiệm trong vấn đề gầy dựng sự nghiệp.
+TƯỚNG VÀNG Đ : Lá TƯỚNG VÀNG Đứng là lá  bài mang đến niềm tin thật đặc biệt cho người xin quẻ.
+TƯỚNG VÀNG Đứng được xem là cứu tinh,quý nhân giàu tình thương,nhân ái,luôn mở rộng vòng tay để nâng đỡ người xin quẻ về mọi mặt trong khuếch trương,gầy dựng sự nghiệp.
+TƯỚNG VÀNG cũng tiêu biểu cho những dấu hiệu thành công rực rỡ,chắc chắn trong vấn đề tiền bạc ở mọi lĩnh vực.
+Với người xin quẻ là thanh niên hay thiếu nữ, TƯỚNG VÀNG sẽ mang lại cuộc hôn nhân giàu,dẫy đầy hạnh phúc.
+Với người xin quẻ là thiếu phụ hay đàn bà góa,sẽ có sự gấm ghé giúp đỡ của người bạn thân đứng tuổi mà có từ thuở thiếu thời.
+TƯỚNG VÀNG N : Lá TƯỚNG VÀNG Ngược đầu tượng trưng cho những trở ngại ngăn cách,làm chậm trễ hay thu hẹp về sự giúp đỡ về tiền bạc cho người xin quẻ.
+Ngoài ra còn tiêu biểu cho sự phản phúc trong thân tộc làm gãy đổ mọi hy vọng về tiền bạc đang lúc sắp thành tựu.
+3. TƯỚNG TRẮNG :
+Trong quẻ bài Tứ Sắc , TƯỚNG TRẮNG tượng trưng cho uy quyền tột đỉnh về mặt luật pháp,và những nhân vật biện minh cho lập trường cá nhân trước uy quyền ấy.
+TƯỚNG TRẮNG Đ : Lá TƯỚNG TRẮNG Đứng tiêu biểu người đại diện luật pháp cầm cân nảy mực,nắm quyền sinh sát trong tay.Dĩ nhiên là người đức độ,phân minh,công bình chánh trực,xét đoán không vị nể,phán quyết như thần linh.Nên lá TƯỚNG TRẮNG xuất hiện trong quẻ là cả một sự sấm sét cho người xin quẻ nếu lâu nay có tâm địa xấu,hèn.
+Lá TƯỚNG TRẮNG cũng nói lên vấn đề liên quan đến pháp lý như tranh tụng,kiện cáo phải cần đến sự biện hộ của luật sư,hoặc can thiệp giản hòa của người trong cuộc.
+Ngoài ra lá TƯỚNG TRẮNG còn tượng trưng cho vị bác sĩ,lương y,nhà tâm lý sẵn sàng can thiệp an ủi,chữa trị cho người xin quẻ khi có việc cần đến,nhất là người xin quẻ đang tìm thầy thuốc chữa trị các chứng bệnh trầm trọng.
+Sau cùng là lá TƯỚNG TRẮNG tiêu biểu cho người đàn ông xấu nết,vũ phu,hung bạo,người chồng lỗ mãng,thiếu suy xét,một người bạn xấu,ích kỷ,biển lận,gièm pha,phản phúc.
+TƯỚNG TRẮNG N : Lá TƯỚNG TRẮNG Ngược đầu là cứu tinh đáng tin cậy của người xin quẻ.Khi cần thăm hỏi về một vấn đề liên quan đến pháp luật mà lá TƯỚNG TRẮNG Ngược đầu xuất hiện trong quẻ,người xin quẻ nên vững tin rằng mình sẽ thắng,hoặc mọi việc sẽ được dàn xếp êm đẹp và có lợi cho phía mình.
+4. TƯỚNG ĐỎ :
+Màu đỏ là màu của sợi chỉ hồng,tượng trưng cho những cuộc hôn nhân do ông Tơ bà Nguyệt dẫn đường đưa lối,TƯỚNG ĐỎ trong quẻ bài Tứ Sắc được ví là ông Tơ,một ông lão được xem là người tác hợp những cuộc tình duyên tiến tới hôn nhân.
+TƯỚNG ĐỎ Đ : Lá bài TƯỚNG ĐỎ Đứng tiêu biểu 1 người đàn ông đứng tuổi,nhân từ,đức độ,giàu tình cảm,xem hàng thanh niên thiếu nữ như những người con.Ông lão này luôn gần gũi,ngầm giúp đỡ nên duyên chồng vợ,tạo nhiều hạnh phúc.
+Lá bài TƯỚNG ĐỎ Đứng cũng là lá bài tượng trưng cho người bạn,người thân,hoặc người yêu luôn thành thật,tốt bụng,tận tâm và trung thành với người xin quẻ trong mọi vấn đề về tình cảm.
+Ngoài ra TƯỚNG ĐỎ còn tượng trưng cho người đàn ông đã có tuổi,có uy quyền,có địa vị,có tiền bạc,luôn giúp đỡ người xin quẻ 1 cách thầm lặng trong hôn nhân.
+TƯỚNG ĐỎ N : Lá TƯỚNG ĐỎ Ngược là lá bài ngăn cách mọi sự liên hệ về tình cảm,tình ái và cả tình bạn.Lá bài này luôn gây sự gãy đổ,biểu thị cho những bất công,bất nghĩa,bất nhân mà người xin quẻ phải đương đầu 1 cách tuyệt vọng vì kẻ bất nhân ấy là kẻ cầm trong tay hoàn cảnh của người xin quẻ.
+CÁC LÁ BÀI SĨ :
+1. SĨ XANH :
+Lá bài Sĩ trong khoa chiêm tinh tượng trưng cho sao Thái Âm,tức là sao trinh bạch trên Thượng Đình.
+Dĩ nhiên 1 nhân vật nhứ thế lúc nào cũng có những ý tưởng êm đềm,thơ mộng và nhất là sự yên tĩnh luôn luôn là điều kiện tối cần cho nhân vật ấy.Tuy nhiên điều khiến chúng ta ngạc nhiên là nhân vật ấy lại có tánh hay ganh tị và ghen tuông.
+Đối với trận mạc, Sĩ là vị quan văn có khả năng lãnh đạo tinh thần binh sĩ,vị văn quan này rất nho nhã, mềm mỏng như người phụ nữ.
+SĨ XANH Đ : Lá SĨ XANH Đứng tiêu biểu cho người đàn bà nhiều ảnh hưởng rộng,tuy không nắm quyền uy trong tay nhưng vẫn có khả năng chi phối tinh thần của rất nhiều người khác,có thế lực.Lá SĨ XANH Đứng trong quẻ bài là 1 nữ ân nhân,một người đàn bà tận tình giúp đỡ,hay một cô gái si mê theo đuổi.Nhưng dù là người đàn bà hay là cô gái thì đều ghen tuông như nhau.Nên quẻ bài có lá SĨ XANH Đứng là lá bài cực tốt và cũng là cực xấu,tùy thuộc vào lá đi kèm nói lên việc ấy.
+SĨ XANH N : Lá SĨ XANH Ngược đầu là mọi cản trở,trở ngại trong tiến thân,thi cử,tiến thủ,khai trương.Không những trở ngại mà còn có thể xảy ra những chuyện não lòng khó tránh.
+2. SĨ VÀNG  :
+Lá SĨ VÀNG trong quẻ bài Tứ Sắc được tiêu biểu cho 1 quý nhân nho nhã,tánh tình mềm mỏng như phụ nữ.
+SĨ VÀNG tượng trưng cho người đàn bà nhiều bản lãnh,nhất là giàu tiền của và nắm trong tay khối thủ đoạn.
+SĨ VÀNG Đ : Là lá bài biểu trưng cho người đàn bà đứng tuổi,đứng đắn,giàu có,nhiều ảnh hưởng về mọi mặt.Người này luôn sẵn sàng giúp đỡ người xin quẻ về mặt tiền tài và nâng đỡ trong việc tạo dựng sự nghiệp.
+Trong quẻ có SĨ VÀNG Đứng thì người xin quẻ chắc chắn sẽ thành công trong mọi tính toán về tiền bạc,nhờ nữ quý nhân âm thầm giúp đỡ.
+Ngoài ra còn là điềm may mắn trong công việc và trong bất cứ toan tính khuếch trương hay cầu cạnh về tiền nong.
+SĨ VÀNG N : Lá SĨ VÀNG Ngược đầu  tượng trưng cho người đàn bà đứng tuổi,có gia đình,hoặc đã góa chồng đang theo đuổi người xin quẻ ( nếu người xin quẻ là nam ) dù người xin quẻ là 1 thanh niên hay đàn ông đã có vợ cũng mặc,người đàn bà này theo đuổi đến độ làm hỏng cả địa vị và tiêu tan tài sản của người xin quẻ.
+Nếu người xin quẻ là thiếu nữ hay thiếu phụ sẽ ngược lại,sẽ được người bạn gái là người đàn bà này tận tình giúp đỡ về tiền bạc.
+
+3. SĨ TRẮNG  :
+SĨ TRẮNG tượng trưng cho 1 thiếu phụ đứng tuổi nham hiểm,đanh đá,sống trong sự lừa dối,xảo trá,buôn danh bán lợi,mẹ mìn,mai mối,có bản chất bất nhân bất nghĩa.
+SĨ TRẮNG Đ : tiêu biểu cho người đàn bà vặn nài bẻ ống,lộn sòng,chuyên nghề mối lái vô nhân,sống trên mồ hôi nước mắt của kẻ khác.Người xin quẻ được lá SĨ TRẮNG là người đang trong hoàn cảnh đứng trên bờ vực thẳm,nếu không dè dặt cẩn thận khôn khéo chắc chắn sẽ không tránh khỏi rơi xuống hố sâu.
+Lá SĨ TRẮNG Đứng cũng là lá bài tượng trưng cho hoàn cảnh u tối trong gia đình,cảnh chồng 1 vợ 2 hoặc vợ 1 chồng 2,gây sự bất hòa có thể đưa đến cảnh đổ vỡ tan nát.
+Ngoài ra lá SĨ TRẮNG còn báo hiệu điều tang khó,tai nạn ngặt nghèo,gây cảnh góa bụa trong gia đình
+SĨ TRẮNG N : Là lá bài giải quyết mọi tình huống bi đát nêu trên,cũng như dàn xếp ổn thỏa gầy dựng lại niềm vui cho gia đình sau cơn giông tố.
+Lá SĨ TRẮNG Ngược đầu còn báo hiệu sự trở về,hối lỗi của người gây xáo trộn trong gia đình lâu ngày ly tán,bỗng nhiên quay lại đoàn tụ bất ngờ.
+4. SĨ ĐỎ :
+SĨ ĐỎ trong lá bài tứ sắc tượng trưng cho người đàn bà đứng tuổi có duyên ngầm quen gọi là bà Nguyệt.
+Trong các cuộc hôn nhân nếu ông Tơ là người đưa đường dẫn lối thì bà Nguyệt là người se duyên chặt chẽ,luôn luôn nuôi mỹ ý làm đẹp cho cuộc sống lứa đôi.
+SĨ ĐỎ Đ : lá SĨ ĐỎ Đứng tiêu biểu cho người đàn bà đứng tuổi đứng đắn,dạt dào tình thương,nhiều đức độ lúc nào cũng gần gũi với người xin quẻ để ngầm tác hợp nâng đỡ,xây dựng hạnh phúc cho người xin quẻ,dù người xin quẻ là thanh niên hay thiếu nữ.
+Lá SĨ ĐỎ Đứng cũng là lá bài tràn đầy hy vọng về phương diện tình cảm,còn nếu người xin quẻ đã lập gia đình lá SĨ ĐỎ Đứng sẽ là lá bài tuyệt vời hạnh phúc.Những thiếu thốn về bất kì phương diện nào : tiền tài,sự nghiệp,đằm ấm,sức khỏe …v…v đều được bù đắp thật đầy đủ ngoài sự mong ước của người xin quẻ.
+SĨ ĐỎ N : Lá SĨ ĐỎ Ngược đầu được xem là lá bài phản phúc trong tình bạn,gian trá trong tình yêu,bất nghĩa trong tình cảm gia đình,lừa đảo trong công việc,bất tín trong hôn nhân,dù người xin quẻ trải qua nhiều đắng cay thử thách rốt cuộc cũng đành ôm hận.
+Ngoài ra lá SĨ ĐỎ Ngược đầu còn tượng trưng cho thiếu nữ xinh đẹp nhưng vô duyên,luôn theo đuổi quấy rầy người xin quẻ nếu người xin quẻ là thanh niên.Còn người xin quẻ là thiếu nữ thì cô gái vô duyên đó sẽ gây ngờ vực làm trở ngại cuộc tình duyên đang gắn bó.
+    CÁC LÁ BÀI TƯỢNG :
+
+1. TƯỢNG XANH :
+Lá bài Tượng là biểu tượng của sức mạnh vô địch,Tượng chịu ảnh hưởng của vì sao Thái Dương trên Thượng Đình.
+Sao Thái Dương là vì sao nhiều đức độ,giàu nhân ái,thích ban bố,tánh tình hào hiệp,nhất là ưa nâng đỡ nhân tài.
+Giữa chiến trận,Tượng tiêu biểu cho võ quan có khả năng bách chiến bách thắng,người lãnh dạo có thực tài,nhiều đức độ dễ thuyết phục ba quân cũng như dễ hòa mình với thuộc hạ bằng tình thương cao quý.
+TƯỢNG XANH Đ : Lá TƯỢNG XANH Đứng tiêu biểu cho người có tánh tình hào phóng,can trường,đức độ,yêu đời,thương người,nhất là rất thành thật nâng người dưới,hỗ trợ kẻ trên.
+Lá TƯỢNG XANH Đứng cũng là lá bài kết dây liên lạc,là người bạn thân tình,thanh niên tốt bụng,và có nhiều uy tín tận tâm giúp đỡ.
+Ngoài ra lá TƯỢNG XANH Đứng cũng tiêu biểu cho một thanh niên thuộc hàng ngũ trong quân đội,người mang tin vui cho người xin quẻ.
+TƯỢNG XANH N : Lá TƯỢNG XANH Ngược đầu tiêu biểu cho người thanh niên xấu bụng,đạo đức giả,tư cách hèn hạ,phỉnh nịnh,lừa dối luôn nuôi trong lòng sự phản bội.
+Lá TƯỢNG XANH Ngược đầu cũng tượng trưng cho người bạn quỷ quyệt,một nhân tình ghen bóng ghen gió,ngầm theo đuổi phá hỏng công danh của mình.
+
+2. TƯỢNG VÀNG :
+Tượng là voi,từ xa xưa voi lãnh phần khá quan trọng trong chiến trận,voi xông pha trận mạc,yểm trợ đắc lực và hữu hiệu cho cuộc tiến quân.
+Trong quẻ bài tứ sắc,Tượng tượng trưng cho thanh niên khỏe mạnh,có khả năng vật chất cũng như tinh thần,sẵn sàng bảo vệ người xin quẻ.
+TƯỢNG VÀNG Đ : Lá TƯỢNG VÀNG Đứng tiêu biểu cho 1 thanh niên đẹp trai,hào hoa phong nhã,có khả năng vật chất cũng như tinh thần,tánh tình rộng rãi luôn luôn nuôi hoài bão giúp đời,giúp người.
+TƯỢNG VÀNG Đứng cũng tiêu biểu cho 1 người bạn tốt,giàu có,thực tâm,nhân hậu,lúc nào cũng tận tình giúp đỡ người xin quẻ,đây chính là vị cứu tinh.
+Nếu người xin quẻ là thiếu nữ,TƯỢNG VÀNG Đứng tiên đoán 1 cuộc hôn nhân giàu có,địa vị.
+Nếu người xin quẻ là thanh niên,TƯỢNG VÀNG sẽ mang lại cuộc tình duyên thật đẹp và nhờ tình duyên này mà người thanh niên sẽ làm nên sự nghiệp.
+TƯỢNG VÀNG N : Lá TƯỢNG VÀNG Ngược đầu tiêu biểu cho sự phản trắc,lừa dối,gãy đổ vì tánh tình thiếu thành thực của người tình,ý trung nhân,hoặc bạn bè,hoặc là vị hôn thê , hôn phu.
+Lá TƯỢNG VÀNG Ngược đầu cũng báo hiệu nhiều xáo trộn xảy ra trong công việc,xí nghiệp,cũng như về tài sản.Cần dè dặt lắm mới tránh được hậu quả bi đát,nhất là khi lá TƯỢNG VÀNG Ngược đầu xuất hiện trong quẻ thì người xin quẻ đừng nghĩ đến việc tiến thân.
+3. TƯỢNG TRẮNG :
+TƯỢNG TRẮNG trong quẻ bài tứ sắc tượng trưng cho 1 thanh niên du đãng,phóng túng,đàng điếm,nghiện ngập,thành phần tứ đổ tường,chuyên sống về nghề ma cô,qua cầu rút ván.
+TƯỢNG TRẮNG Đ : Lá TƯỢNG TRẮNG Đứng tiêu biểu cho mọi quyến rũ về vật chất,lung lạc tinh thần,cạm bẫy đam mê,đưa người xin quẻ sa vào tình trạng bị thu hút không lối thoát.Nếu sa chân vào vũng lầy này thì càng cựa quậy càng lún sâu thêm.
+Lá TƯỢNG TRẮNG Đứng cũng tượng trưng cho 1 thanh niên lạ có mã đẹp trai ăn nói lưu loát,nhưng là 1 thanh niên mất nết,thiếu nhân phẩm,giỏi tán tỉnh mê hoặc người xin quẻ.Nếu người xin quẻ là thiếu nữ thì cần hết sức giữ gìn kẻo bị lôi cuốn vào vòng sa ngã .Nếu người xin quẻ là thanh niên thì người thanh niên xấu tính sẽ theo quấy rầy,ngầm phá hỏng mọi công trình của mình hoặc dựng mồi câu nhử đến tán gia bại sản.
+TƯỢNG TRẮNG N : TƯỢNG TRẮNG Ngược đầu là lá bài không những nhiều hy vọng mà còn thực hiện được ý định của mình,nhất là trong vấn đề tình ái.
+Lá TƯỢNG TRẮNG Ngược đầu cũng tiêu biểu cho những thắng lợi về các cuộc tranh chấp,hoặc báo hiệu sắp có cuộc đi du lịch nơi xa, việc hôn nhân hay công việc đều thuận lợi.
+4. TƯỢNG ĐỎ :
+TƯỢNG ĐỎ là lá bài trẻ trung nhất trong các lá bài thuộc phạm vi tình cảm ( 28 lá màu đỏ ).
+Người xin quẻ dù là thanh niên hay thiếu nữ một khi xin quẻ tình duyên gặp lá bài TƯỢNG ĐỎ Đứng trong quẻ chắc chắn sẽ thành công mặc dù trước đó có sự ngang trái bẽ bàng trong tình duyên.
+TƯỢNG ĐỎ Đ : Lá TƯỢNG ĐỎ Đứng tượng trưng cho 1 thanh niên đẹp trai,phong lưu tao nhã,luôn luôn có tư tưởng cao đẹp,là người bạn tốt đối với người xin quẻ.Còn nếu người xin quẻ là thiếu nữ thì người thanh niên tốt này tương lai sẽ là vị hôn phu của người thiếu nữ ấy.
+Lá TƯỢNG ĐỎ Đứng cũng tượng trưng cho 1 thiếu nữ duyên dáng,cao thượng,là người bạn tình cờ gặp gỡ của người xin quẻ nếu người xin quẻ là thanh niên,từ tình bạn đến tình duyên chỉ là 1 bước ngắn đầy dẫy hạnh phúc.
+Lá TƯỢNG ĐỎ Đứng là lá bài cầu duyên,những cuộc tình duyên lỡ làng,những trở ngại trong hôn nhân,những hiểu lầm không đáng có trong mối tình đầu thì người xin quẻ dù là thanh niên hay thiếu nữ nếu gặp TƯỢNG ĐỎ Đứng xuất hiện trong quẻ cuộc tình duyên sẽ thành tựu chắc chắn,tiến đến hôn nhân rỡ ràng.
+TƯỢNG ĐỎ N : Lá TƯỢNG ĐỎ Ngược đầu tiêu biểu cho tất cả những gì phũ phàng trong tình yêu.
+Nếu người xin quẻ đã lập gia đình, lá TƯỢNG ĐỎ Ngược đầu là lá bài báo hiệu sự đảo lộn hoàn cảnh của gia đình ấy một cách bi đát.
+
+    CÁC LÁ BÀI XE :
+
+1. XE XANH :
+Xe là lá bài chịu ảnh hưởng của sao Thổ Tinh trên Thượng Đình.
+Sao Thổ Tinh là vị vua mất ngôi,quanh năm có thái độ u buồn,chán nản,hối hận vì những lỡ lầm trong quá khứ,thích sống trầm lặng,không còn nuôi ý chí tiến thủ.
+Nơi chiến trường Xe tiêu biểu cho sĩ quan liên lạc,thi hành chỉ thị của cấp trên,hoặc tình báo viên lỗi lạc nhưng có tánh nông nỗi nên đôi khi thất bại vì sự nông nỗi ấy.
+XE XANH Đ : Lá XE XANH Đứng tượng trưng cho sự chậm trễ bất lợi về mọi mặt,nhất là các việc tiến thân ,thi cử hoặc khởi đầu công trình.Nguyên nhân là do sự rụt rè,chần chờ,thiếu kiên quyết của mình mà mọi việc đều chịu ảnh hưởng tai hại.
+Lá XE XANH Đứng còn tiêu biểu cho sự bê tha,đồi trụy,lãng mạn nhưng gây bất mãn cho mọi người.
+Tuy nhiên lá XE XANH Đứng báo hiệu cho 1 chuyến đi du lịch xa hoặc 1 sự thay đổi thắng lợi về công danh.
+XE XANH N : XE XANH Ngược đầu là lá bài báo hiệu mọi trở ngại,thất bại,chậm trễ,không có kết quả trong bất cứ dự tính nào.Nhất là định nuôi ý định đi xa hay thay đổi việc làm,chỗ ở,có thể đổ vỡ tất cả mà không hy vọng phục hồi địa vị hoặc tình trạng cũ.
+
+2. XE VÀNG :
+Trong quẻ bài Tứ Sắc thì XE VÀNG chiếm địa vị ưu thế,tiêu biểu cho sự chuyển vận tiền bạc làm nên sự nghiệp cho người xin quẻ.Vì thế khi lá Xe xuất hiện trong quẻ bài thì người xin quẻ có thể mơ ước 1 món tiền sẽ đến,của hoạnh tài,di sản,quà tặng có giá trị.
+XE VÀNG Đ : Tiêu biểu cho mọi sự bất ngờ đưa đến cho người xin quẻ đang trong cơn bối rối không biết cậy nhờ vào đâu,hy vọng ấy có thể đến từ món tiền to bất ngờ như trúng số.
+XE VÀNG Đứng cũng tiêu biểu cho sự thịnh vượng gần kề của gia đình,sự thành công chắc chắn trong công việc môi giới mua bán hoặc sự thành tựu trong ý định khuếch trương và sau cùng là sự thắng lợi bất ngờ trong vụ kiện dai dẳng lâu ngày chưa giải quyết xong.
+XE VÀNG N : Lá XE VÀNG Ngược đầu là bối cảnh của sự lừa phỉnh về tiền bạc,sự dối lừa về bạc tiền được che đậy,kẻ có dã tâm cố tình phỉnh gạt.Ngoài ra cũng báo trước sự mất của do đánh rơi,bị mất cắp hoặc tiền cho mượn.
+XE VÀNG Ngược đầu còn ước đoán cho những thua lận có thể sạt nghiệp và tiêu tan nhà cửa nếu người xin quẻ là người ham mê cờ bạc.
+
+3. XE TRẮNG :
+XE TRẮNG trong quẻ bài tứ sắc tiêu biểu cho xe tang,mang đến hoàn cảnh não nề,buồn bã,sầu đau,những cảnh ly tán không phương hàn gắn.
+XE TRẮNG Đ : Báo động mọi chuyện phiền muộn xảy ra cho gia đình người xin quẻ như ốm đau bệnh tật thập tử nhất sinh,chết chóc khó tránh,gia đình ly tán,chồng vợ xa nhau đưa đến ly dị.
+XE TRẮNG Đứng báo trước sự xa quê nhà vì nợ nần,hoặc vấn đề liên quan đến hôn nhân khiến người xin quẻ không còn đủ can đảm ở lại trước sự não nề về tinh thần lẫn vật chất.
+XE TRẮNG Đứng còn tiêu biểu cho nước mắt,những sự hiểm nguy bất ngờ làm xáo trộn hay sụp đổ tương lai.
+Sau cùng XE TRẮNG còn tiêu biểu cho sự hối hận vô bờ bến vì 1 lỗi lầm trong dĩ vãng mà người xin quẻ day dứt không nguôi.Hậu quả của sự hối hận còn có thể đưa người xin quẻ đến của Phật để nhờ sự an ủi của thiêng liêng xoa dịu phần nào điều hối hận.
+XE TRẮNG N : XE TRẮNG Ngược đầu là lá bài biến đổi hẳn những tình trạng của lá XE TRẮNG Đứng, mang lại niềm tin,hàn gắn mọi não nề,hoặc chặn đứng những việc xấu trước khi xảy ra.
+Nếu gặp cơn bệnh tật ngặt nghèo,gặp XE TRẮNG Ngược đầu sẽ gặp thầy thuốc giỏi,thuốc lành chữa trị lành căn bệnh.
+
+4. XE ĐỎ :
+Trong quẻ bài tứ sắc, TƯỢNG ĐỎ là lá bài cầu duyên thì  XE ĐỎ là lá bài cầu tự,lá bài này rất phù hợp với những người đã lập gia đình hơn là các bạn thanh niên nam nữ.
+XE ĐỎ Đ : Là lá bài thứ nhất trong bức tranh Phúc Lộc Thọ,lá bài này cầu con vô cùng linh nghiệm.Phúc là con cái đầy dẫy những hạnh phúc trong tình thương yêu gia đình.Những người không con trông chờ sự nối dõi tông đường một khi xem quẻ bài tứ sắc khai đường mở lối cho việc cầu con mà gặp lá XE ĐỎ Đứng thì chắc chắn sẽ được như ý.
+Tuy nhiên lá XE ĐỎ Đứng là lá bài tối kỵ cho việc cầu duyên.Tối kị với ý nghĩa bao quát,cầu con của người đó.Nếu người thanh niên cầu duyên mà gặp lá bài này thì người thanh niên ấy sẽ có con rơi.Phũ phàng nhất cho người xin quẻ là thiếu nữ,gặp lá XE ĐỎ Đứng nên hết sức tự chủ,kẻo lâm vào tình trạng chửa hoang đầy bất hạnh.
+XE ĐỎ N : Là lá bài độc nhất gây thất vọng cho người xin quẻ khi muốn cầu duyên.
+Hơn thế nữa XE ĐỎ Ngược đầu còn là lá bài báo động sự phản bội ân tình trong gia đình của người đàn ông hay đàn bà,nếu 1 trong 2 người có sự mơ ước viễn vông.
+
+    CÁC LÁ BÀI PHÁO :
+
+1. PHÁO XANH :
+Lá Pháo chịu ảnh hưởng của sao Hỏa Tinh trên Thượng Đình.
+Hỏa Tinh là vị thần chiến tranh,tính tình hết sức nóng nảy,gan dạ,hào hùng,chững chạc và đầy can đảm giữa chốn hiểm nguy,luôn nuôi ý chí chiến đấu mãnh liệt.Nhưng cũng rất tự chủ lúc nào cũng kìm hãm cá tính của mình,rất cao thượng và đầy tinh thần thượng võ.
+PHÁO XANH Đ : Lá PHÁO XANH Đứng báo trước 1 sự thay đổi về địa vị,đổi nghề,hoặc dời chỗ ở,hay nơi du lịch xa xôi với nhiều hy vọng thắng lợi về danh vọng cũng như tiền bạc,nếu là chuyện tâm tình thì trăm phần trăm thỏa mãn.
+PHÁO XANH Đứng còn tượng trưng cho thiếu nữ kiều diễm,khả ái,chung tình,gặp gỡ bất ngờ mà thành duyên nợ nếu như người xin quẻ là thanh niên.
+PHÁO XANH Đứng cũng tiêu biểu cho 1 sự đỗ đạt chắc chắn nếu người xin quẻ sắp sửa bước vào ngưỡng cửa trường thi.
+PHÁO XANH N : PHÁO XANH Ngược đầu là lá bài hung tin,gãy đổ chực chờ,có những lời gièm pha,nói xấu,cãi vã luôn lãng vãng bên mình gây nhiều phiền toái không thể tránh.
+Lá PHÁO XANH Ngược đầu cũng báo hiệu sự mất của và hoen ố danh dự.
+
+2. PHÁO VÀNG :
+Pháo trong chiến trận là 1 chiến cụ tấn công,còn trong quẻ bài tứ sắc pháo đóng vai trò tương đương,bảo vệ người xin quẻ,chống mọi chướng ngại xung quanh.
+PHÁO VÀNG là lá bài sự nghiệp,mang ý nghĩa vun vén cho người xin quẻ về mọi mặt nhất là về tiền bạc để làm nên sự nghiệp,đồng thời cũng bảo vệ người xin quẻ bảo vệ sự nghiệp ấy.
+PHÁO VÀNG Đ : PHÁO VÀNG Đứng xuất hiện trong quẻ nói lên việc khởi sự cần tiến hành ngay. Mở cửa hàng,khởi công,đi xa,lập nghiệp…v..v.Hễ trong lòng mình nghĩ sao cứ làm vậy chắc chắn sẽ thành công vì có nhiều người có uy tín nâng đỡ.
+PHÁO VÀNG Đứng cũng là lá bài giải quyết vấn đề tiền bạc đang khó khăn,thiếu thốn,nợ nần,tranh chấp..v..v,lá bài PHÁO VÀNG Đứng xuất hiện trong quẻ thì không còn lo ngại nữa,mọi sự sẽ được giải quyết êm đẹp.
+Ngoài ra PHÁO VÀNG Đứng còn dứt khoát với những lời hứa hẹn,chẳng hạn như hứa hẹn trong hôn nhân,hứa hẹn tiến cử,hứa hẹn giúp đỡ..v..v mọi việc sẽ thành tựu.
+PHÁO VÀNG N : PHÁO VÀNG Ngược đầu có ý nghĩa Ngược lại hoàn toàn so với lá bài Đứng.Những đổ vỡ là không thể tránh,nhất là nợ nần,tranh chấp tiền bạc,hứa hẹn hôn nhân…v..v. Trừ trường hợp PHÁO VÀNG Ngược đầu đi kèm với lá TƯỢNG VÀNG N ( Ngược đầu ) thì mọi việc sẽ dàn xếp tuy chậm nhưng cũng dàn xếp thỏa đáng.
+
+3. PHÁO TRẮNG :
+PHÁO TRẮNG là tiếng nổ trong đáy lòng người xin quẻ,gây những thảm trạng đau thương về tinh thần do vật chất chi phối.
+PHÁO TRẮNG Đ : Tiêu biểu cho sự mất mát do trộm cắp,khánh kiệt,xuống dốc trong việc làm cũng như trong địa vị do sự tin tưởng không giới hạn đối với người thân tín hoặc nhân tình.Ngày sụp đổ là ngày mà người xin quẻ cảm thấy trong lòng trống vắng,trơ trọi không được nghe 1 lời an ủi dù chỉ là lời an ủi suông.
+PHÁO TRẮNG Đứng cũng là lá bài báo động cuộc thay đổi xáo trộn địa vị không thể tránh khiến người trong cuộc phải chịu sự xê dịch bất đắc dĩ,không khác cuộc lưu đày không hạn định.
+Ngoài ra PHÁO TRẮNG Đứng còn là lá bài tượng trưng cho sự điên loạn sau khi tình cờ phát giác được sự lừa dối của người xung quanh đã phản bội mình,lừa tiền lừa tình còn mất cả sự nghiệp.
+Sau cùng PHÁO TRẮNG Đứng còn tiêu biểu cho những ung nhọt trong gia đình,con cái hư hỏng,những chuyện tày trời bị phát giác,hoặc có cãi vã với người trong thân tộc thành to chuyện.
+PHÁO TRẮNG N : PHÁO TRẮNG Ngược đầu là sự phát giác đúng lúc mọi vấn đề,chưa xảy ra,hoặc vừa xảy ra nhưng ngăn chặn kịp thời nên thu xếp ổn thỏa.
+PHÁO TRẮNG Ngược đầu còn tiêu biểu cho sự ăn năn,tự giác,nhờ đó tình trạng gia đình được an vui hạnh phúc tránh được sự bi đát đổ vỡ.
+
+4. PHÁO ĐỎ :
+PHÁO ĐỎ là lá bài phản ảnh một màu sắc đặc biệt trong vấn đề tình duyên,màu sắc thắm đượm của tuổi trẻ trước những bước đi ngập ngừng khi sắp qua ngưỡng cửa hạnh phúc.
+PHÁO ĐỎ Đ : Là lá bài thực hiện 1 cách chắc chắn những hy vọng nhen nhóm trong lòng.Địa vị,hoàn cảnh,sự nghiệp sẽ tiếp nối cuộc hôn nhân hoàn toàn vừa ý giữ đôi trai tài gái sắc cùng nhau gắn bó bằng nhịp cầu tình ái dẫy đầy hạnh phúc.
+Lá PHÁO ĐỎ Đứng còn tiêu biểu cho  mọi sự thành tựu,thắng lợi và cũng là lá bài chinh phục mọi vấn đề thuộc lĩnh vực tâm tình.Mọi hứa hẹn sẽ được thực hiện với 1 tương lai rực rỡ trước ánh sáng của tình yêu.
+Ngoài ra PHÁO ĐỎ Đứng còn tượng trưng cho những món của hồi môn đáng giá như nhà cửa,tiền bạc..v..v cho người xin quẻ,dù người xin quẻ là thanh niên hay thiếu nữ.
+Sau cùng nếu người xin quẻ là người đã lập gia đình,lá PHÁO ĐỎ Đứng là lá bài hạnh phúc gia đình,con cái làm nên danh phận.
+PHÁO ĐỎ N : Lá PHÁO ĐỎ Ngược đầu là lá bài báo động những hiểu lầm đáng tiếc giữa cuộc tình duyên đang trên đà tốt đẹp sắp tiến tới hôn nhân.Nhưng sự hiểu lầm này chỉ xảy ra trong thời gian ngắn và được hàn gắn lại như buổi ban đầu vì PHÁO ĐỎ Ngược đầu không phải là lá bài quá xấu.
+    NHỮNG LÁ BÀI NGỰA :
+
+1. NGỰA XANH :
+Ngựa là lá bài chịu ảnh hưởng của sao Kim Tinh tức là thần Vệ Nữ, là chúa của sắc đẹp,nữ hoàng của tình ái luôn yêu chuộng sự xa hoa phù phiếm,vui tính,nuông chiều,diễm lệ,dạt dào tình cảm và rất lãng mạn.
+Thần Vệ Nữ mang đến cho lứa đôi nhiều niềm vui,sự gặp gỡ nên thơ và dễ trở thành duyên nợ.
+Ngựa còn tiêu biểu cho sự xông pha linh động,đủ sắc đẹp lay chuyển đối phương, đây là quân bài gián điệp vô cùng bén nhọn và hiệu quả.
+NGỰA XANH Đ : Lá NGỰA XANH Đứng là lá bài vui tươi thịnh vượng về mọi mặt,công danh,thương mại,tiến thân,thi cử vừa thắng lợi về tiền bạc vừa thành đạt về danh dự.
+Lá NGỰA XANH Đứng còn tiêu biểu cho tin vui về tình cảm,bạn bè,êm đềm trong tình ái,hứa hẹn sự gặp gỡ gần kề kết thành cuộc trăm năm gắn bó.
+Ngoài ra lá NGỰA XANH Đứng còn là lá bài báo hiệu 1 tương lai xán lạn cho thanh niên,thiếu nữ.Nếu người xin quẻ đã có gia đình thì sẽ sinh con quý.Nếu người xin quẻ đang trên đường tiến thân,thi cử chắc chắn sẽ thành đạt.
+NGỰA XANH N : Lá NGỰA XANH Ngược đầu vẫn tiêu biểu cho nhiều bất ngờ thơ mộng,lợi lộc vào đúng theo mong ước.Chỉ có 1 điều đặc biệt nếu lá NGỰA XANH Ngược đầu đi kèm lá NGỰA TRẮNG ở bất cứ bên trái hay bên phải đều bị tan vỡ vì gặp sự ghen tuông vô lối không đúng chỗ.
+
+2. NGỰA VÀNG :
+Lá NGỰA VÀNG trong quẻ sự nghiệp tượng trưng cho sự xông xáo hoạt động không ngừng của người xin quẻ trong mưu cầu lập nghiệp mà viễn cảnh thành công vẫn còn mờ mịt.
+NGỰA VÀNG Đ : Lá NGỰA VÀNG Đứng tiêu biểu cho sự sa chân lỡ bước của người xin quẻ vì nhẹ dạ cả tin,non lòng,chưa kinh nghiệm trong việc khuếch trương sự nghiệp nên hay nghe những lời a dua nịnh bợ khiến việc tiến thủ ngày càng trở nên bi quan.Lá NGỰA VÀNG Đứng xuất hiện trong quẻ được xem là cứu tinh độc nhất giúp người xin quẻ vãn cứu được tình trạng.
+Lá NGỰA VÀNG Đứng cũng tượng trưng cho 1 cô gái đẹp,duyên dáng,dí dỏm,sẽ trở thành bạn thân của người xin quẻ dù người xin quẻ là thanh niên hay thiếu nữ,cô gái này là người bạn thân cao quý,luôn luôn ngầm giúp đỡ bạn mình trong mọi trường hợp tiến thân lập nghiệp.
+Ngoài ra NGỰA VÀNG Đứng còn là viễn cảnh của sự thịnh vượng trong sự nghiệp,thành công trong tiền bạc và tăng trưởng tài sản nhờ dịp may đến.
+NGỰA VÀNG N : Lá NGỰA VÀNG Ngược đầu là tâm trạng u buồn của người xin quẻ trước mọi sự xoay sở về tiền bạc,những trở ngại dồn dập không phương đắp vá.
+Lá NGỰA VÀNG Ngược đầu cũng là lá bài báo trước cho người thanh niên hay thiếu nữ xin quẻ nên thoái bước trước mọi sự hứa hẹn về hôn nhân vì vấn đề tiền bạc mới thực sự là đầu dây mối nhợ của cuộc hôn nhân này,đừng hy vọng nhiều mà thất vọng.
+
+3. NGỰA TRẮNG :
+NGỰA TRẮNG trong quẻ bài tứ sắc là lá bài cay đắng nhất trong vấn đề tình ái,cũng là lá bài độc nhất gây xáo trộn cho hạnh phúc lứa đôi.
+NGỰA TRẮNG Đ : Là lá bài tiêu biểu cho 1 thiếu nữ sắc nước hương trời,là đầu dây mối nhợ của những xáo trộn về hôn nhân,duyên đầu.Nếu người xin quẻ là 1 thiếu nữ, NGỰA TRẮNG Đứng là tình địch lợi hại,phải hết sức khôn khéo mới giữ được người yêu,nhưng với lá NGỰA TRẮNG Đứng sự giữ gìn này chỉ là 1 niềm hy vọng mong manh.Nếu người xin quẻ là 1 thanh niên sẽ không tránh khỏi cảnh ghen tuông nguy hiểm.
+Lá NGỰA TRẮNG Đứng còn là lá bài tượng trưng cho sự chống đối ngầm,cạm bẫy nguy hiểm của người bạn gái đẹp mặt mà không đẹp lòng.Nhất là người xin quẻ là thanh niên thì cạm bẫy này lại càng đáng sợ hơn nữa có thể làm người thanh niên ôm hận suốt đời.
+Ngoài ra lá NGỰA TRẮNG Đứng còn tiêu biểu cho những trở ngại về hôn nhân,do sự chống đối của 1 trong 2 bên cha mẹ,hoặc do sự can thiệp của kẻ thứ 3 trong thân tộc gây đau khổ không nhỏ cho người xin quẻ và cho cả người yêu của người xin quẻ.
+NGỰA TRẮNG N : Lá NGỰA TRẮNG Ngược đầu tiêu biểu cho 1 tâm hồn cao thượng,một sắc đẹp lộng lẫy của cô gái,hoặc ý trung nhân của người xin quẻ.Người bạn gái hay bạn tình này sẽ mang lại cho người xin quẻ nhiều hạnh phúc trong tương lai.
+Lá NGỰA TRẮNG Ngược đầu cũng là lá bài chấm dứt mọi chướng ngại về hôn nhân mang lại hạnh phúc cho lứa đôi.
+
+4. NGỰA ĐỎ :
+NGỰA ĐỎ trong quẻ bài tứ sắc tiêu biểu cho những sự bất ngờ trong tình duyên.
+NGỰA ĐỎ Đ : Lá NGỰA ĐỎ Đứng tiêu biểu cho mối tình bất ngờ gặp nhau trong trường hợp hết sức bất ngờ trên chuyến xe,trong rạp hát,nơi quán ăn,ngoài đường..v..v.Chuyện bất ngờ có thể là sự thăm hỏi lối đi,hoặc vài câu xã giao trên chuyến xe..v..v.Từ những câu hỏi nhỏ nhặt ấy đưa đến cuộc hẹn hò rồi từ đó gặp gỡ và có mối duyên tình gắn chặt.
+Lá NGỰA ĐỎ Đứng cũng tiêu biểu cho sự đùa cợt giữa cuộc họp bạn,lúc đi đường,qua các công viên..v..v.Vài câu đùa cợt duyên dáng,vô tình mà lại nhen nhúm cho những mối tình bất ngờ về sau sẽ thắm thiết và cao đẹp.
+Lá NGỰA ĐỎ Đứng còn tiêu biểu cho sự khám phá những mối tình thầm lặng,e ấp,không dám thổ lộ.Nhưng rồi trong 1 trường hợp hoàn toàn vô tình,mối tình thầm lặng ấy tự nhiên được thổ lộ qua cử chỉ,qua đôi mắt,hoặc qua lời nói vô tình mà trở thành những cuộc tình duyên vô cùng thơ mộng.
+NGỰA ĐỎ N : Lá NGỰA ĐỎ Ngược đầu là lá bài hứa hẹn những cuộc tranh giành vô lý trong tình yêu do sự ghen tuông ganh tị 1 cách vô lý,vụng về mà hậu quả là sự cô đơn tai hại cho cả 2 tâm hồn.
+
+NHỮNG LÁ BÀI CHỐT :
+
+1. CHỐT XANH :
+Chốt là lá bài chịu ảnh hưởng của sao Thủy Tinh trên Thượng Đình.
+Sao Thủy Tinh là vì sao liên lạc giữa thiên giới và hạ giới mang lại những điều tốt lẫn xấu cho mọi người.
+Với sao Thủy Tinh mọi hy vọng sẽ thành đạt nếu người xin quẻ là người sáng suốt hiểu mình  - hiểu người.Nếu người xin quẻ là người tham vọng sẽ gặp nhiều phiền não bi đát vì sao Thủy tinh cũng là vì sao nổi tiếng là vua đạo chích trên Thượng Đình.
+Nơi trận mạc Chốt tượng trưng cho người chiến binh,chịu sự sai khiến của các cấp.Dĩ nhiên người chiến binh này rất có thể xứng đáng hoặc rất xấu xa.
+CHỐT XANH Đ : Là lá bài báo động mọi chống đối,cãi vã,xáo trộn trong gia đình và sự gièm pha,gấu ó,bêu xấu,tranh giành,kiện tụng bên ngoài gây nên sự dang dở,hiểm nguy cho tương lai người xin quẻ.
+CHỐT XANH Đứng cũng là lá bài tượng trưng cho mọi trở ngại trong ý định tiến thủ bất cứ về vấn đề gì.Nhất là chuyện tâm tình thì đừng bao giờ nên nghĩ đến vì bạn bè hay phản trắc,lừa dối.
+CHỐT XANH N : Lá CHỐT XANH Ngược đầu là lá bài hứa hẹn nhiều hy vọng nhất là những chuyện đến bất ngờ ngoài sự tưởng tượng của người xin quẻ.
+
+2. CHỐT VÀNG :
+ Lá CHỐT VÀNG trong quẻ sự nghiệp là lá bài sau cùng có tính cách khiêm nhường nhưng sâu sắc vì lẽ đó sự thành – bại sẽ tương đương nhau.
+CHỐT VÀNG Đ : Lá CHỐT VÀNG Đứng tiêu biểu cho 1 người tiến thoái lưỡng nan,có là người xin quẻ lưỡng lự trước 1 công việc nửa muốn tiến nửa muốn lùi.Tiến thì nghĩ mình không đủ khả năng e sợ thất bại.Lùi thì biết bao giờ lập nên sự nghiệp muốn đánh 1 ván liều nhưng vẫn còn rụt rè.Có lá CHỐT VÀNG xuất hiện trong quẻ sẽ báo hiệu 1 sự vững vàng trong những bước đầu tiên.Người xin quẻ sẽ không còn lưỡng lự nữa.
+Lá CHỐT VÀNG Đứng cũng nói lên nếu đang có sự gay gắt,gièm pha,đàm tiếu..v..v làm ngã lòng người xin quẻ trước 1 công việc vừa vạch ra thì lá CHỐT VÀNG Đứng xuất hiện trong quẻ sẽ giúp người xin quẻ có đủ can đảm để tiến bước hầu gặt lấy sự thành công giữa những chông gai.
+Ngoài ra lá CHỐT VÀNG Đứng còn tượng trưng cho 1 người bạn ở xa,hoặc 1 người trong thân tộc đã từ lâu vắng mặt,hay 1 người thương thất lạc,bặt tin từ lâu bỗng gặp lại và mang về nhiều tiền giúp đỡ tận tình người xin quẻ làm nên sự nghiệp.
+CHỐT VÀNG N : Lá CHỐT VÀNG Ngược đầu đem đến tất cả sự não nề cho người xin quẻ, như thất bại trong công việc,thua lỗ trong mọi sự khuếch trương gây công nợ lôi cuốn đến chốn tụng đình,còn hoen ố danh dự.
+
+3. CHỐT TRẮNG :
+CHỐT TRẮNG là lá bài xấu nhất trong 112 lá bài Tứ Sắc.Nếu nói lái theo miền Nam chúng ta có 1 từ gần như huyền thoại như thế này : CHỐT TRẮNG = chắc trốn.
+Ý nghĩa của lá bài CHỐT TRẮNG xuất hiện trong quẻ thì chắc chắn 100% là chắc trốn.
+CHỐT TRẮNG Đ : Là lá bài tượng trưng cho tất cả sự đổ vỡ,tan nát,sụp đổ,phá sản,ly tán,tang tóc không phương cứu vãn.Trong 1 quẻ bài Tứ Sắc,bất cứ quẻ ấy xin về việc gì nếu thấy lá CHỐT TRẮNG Đứng xuất hiện thì người xin quẻ chỉ còn nước phó thác cho vận hạn xoay chuyển hoặc tìm cách tự cứu càng sớm càng tốt để vơi đi hậu quả không thể lường trước được.
+CHỐT TRẮNG N : Lá CHỐT TRẮNG Ngược đầu tuy không có giá trị khả quan như  những lá bài màu Trắng Ngược đầu khác nhưng CHỐT TRẮNG Ngược đầu có thể ngăn chặn sự bộc phát quá to của quẻ bài xấu để người xin quẻ kịp thời tìm biện pháp thoát hiểm.
+
+4. CHỐT ĐỎ :
+CHỐT ĐỎ trong quẻ bài Tứ sắc tượng trưng cho loài nhạn đưa tin trong vấn thuộc lĩnh vực tình duyên.
+CHỐT ĐỎ Đ : Lá CHỐT ĐỎ Đứng là cánh nhạn từ xa mang tin về,mang tin lành hứa hẹn mối duyên lành tràn ngập hạnh phúc.
+Nếu người xin quẻ là thiếu nữ sẽ gặp được chàng trai,tuy ban đầu lạ lẫm nhưng trở thành quen sau đó không buộc mà nên không thắt mà thành người trai lạ ấy sẽ là ý trung nhân của thiếu nữ.Nếu người xin quẻ là 1 thanh niên những lá thư mang tin đến từ người bạn gái năm xưa học cùng lớp,cùng trường lâu ngày không gặp bỗng tình cờ tin nhạn bay về và từ đó trở thành duyên nợ.
+Lá CHỐT ĐỎ Đứng còn báo trước cuộc thăm viếng bất ngờ của người bạn thân lâu năm xa cách khiến lòng người xin quẻ nhiều phen ray rức,như mong ai,chờ ai mà vẫn bặt tin tức.Nay tình cờ người bạn thân ấy trở lại,cuộc gặp gỡ là cuộc tao phùng,mọi nỗi lòng đều được thổ lộ cùng nhau,duyên thắm từ đó thành tựu 1 cách cao đẹp.
+Cuối cùng lá CHỐT ĐỎ Đứng tiêu biểu 1 cánh nhạn lành do người thân tộc mang đến,cánh nhạn này là lời đề nghị của cuộc hôn nhân gắn bó,thành thật mà lâu nay người trong cuộc thầm mơ trộm ước nay tình cờ bắt được tin lành.
+CHỐT ĐỎ N : Lá CHỐT ĐỎ Ngược đầu là lá bài tiên đoán sự hối tiếc to tát.Từ sự hối tiếc này đưa đến ân hận tràn ngập vì đã trót lỡ lầm trong quá khứ,trong phút say đắm,mê muội đã chấp nhận cuộc hôn nhân thiếu thành thật và ngày giờ này sự thiếu thành thật đó bộc lộ rõ rệt.
+    `;
+
+    /* =====================================================
+       PHẦN 1: AUTO-FILL / AUTO-CORRECT
+       Cấu trúc nhập:  QUÂN  +  MÀU  +  VỊ TRÍ (tùy chọn)
+       - Bỏ dấu cũng được: "tuong xanh d" -> TƯỚNG XANH Đ
+       - Không có vị trí = nghĩa chung của quân bài
+       ===================================================== */
+
+    const PIECES = ['TƯỚNG', 'SĨ', 'TƯỢNG', 'XE', 'PHÁO', 'NGỰA', 'CHỐT'];
+    const COLORS = ['XANH', 'VÀNG', 'TRẮNG', 'ĐỎ'];
+
+    // Bỏ dấu + viết hoa để so khớp (Đ -> D)
+    function norm(s) {
+        return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[đĐ]/g, 'D').toUpperCase().replace(/\s+/g, ' ').trim();
+    }
+
+    // Khoảng cách chỉnh sửa (để sửa lỗi gõ sai 1 ký tự)
+    function lev(a, b) {
+        const m = a.length, n = b.length;
+        if (!m) return n; if (!n) return m;
+        let prev = Array.from({ length: n + 1 }, (_, j) => j);
+        for (let i = 1; i <= m; i++) {
+            const cur = [i];
+            for (let j = 1; j <= n; j++) {
+                cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+            }
+            prev = cur;
+        }
+        return prev[n];
+    }
+
+    const LEVELS = [
+        PIECES.map(t => ({ text: t, aliases: [norm(t)] })),
+        COLORS.map(t => ({ text: t, aliases: [norm(t)] })),
+        [
+            { text: 'Đ', aliases: ['D', 'DUNG'] },
+            { text: 'N', aliases: ['N', 'NGUOC'] }
+        ]
+    ];
+
+    // Mọi ký tự CÓ DẤU mà người dùng đã gõ phải trùng đúng ký tự ở cùng vị trí của từ chuẩn
+    // (ký tự không dấu thì bỏ qua -> gõ "tuong" vẫn ra cả TƯỚNG lẫn TƯỢNG)
+    function diacriticOk(rawTok, text) {
+        for (let k = 0; k < rawTok.length; k++) {
+            const c = rawTok[k];
+            if (norm(c) !== c && text[k] !== c) return false;
+        }
+        return true;
+    }
+
+    // Phân tích chuỗi nhập thành các trạng thái khả dĩ
+    function engine(value) {
+        let raw = value.replace(/^\s*\d+\s*[:.\-]\s*/, '');
+        const endsSpace = /\s$/.test(raw);
+        let tokens = norm(raw).split(' ').filter(Boolean);
+        // rawTokens: giữ nguyên dấu người dùng gõ (để phân biệt TƯỚNG / TƯỢNG)
+        let rawTokens = raw.normalize('NFC').toUpperCase().split(/\s+/).filter(Boolean);
+        if (endsSpace) { tokens.push(''); rawTokens.push(''); }
+        if (tokens.length === 0) { tokens = ['']; rawTokens = ['']; }
+        tokens = tokens.slice(0, 3);
+        rawTokens = rawTokens.slice(0, 3);
+
+        let states = [{ parts: [], chung: false }];
+        tokens.forEach((tok, i) => {
+            const last = i === tokens.length - 1;
+            const next = [];
+            states.forEach(s => {
+                // Token rỗng ở vị trí thứ 3 = chọn "nghĩa chung"
+                if (i === 2 && tok === '' && last) next.push({ parts: s.parts, chung: true });
+
+                const opts = LEVELS[i];
+                let hits = opts.filter(o => o.aliases.some(a => last ? a.startsWith(tok) : (a === tok || a.startsWith(tok))));
+                // Nếu người dùng đã gõ dấu (TƯỚNG, TƯỢNG, ĐỎ...) thì dấu phải khớp đúng
+                if (i < 2) hits = hits.filter(o => diacriticOk(rawTokens[i], o.text));
+                if (!hits.length && tok.length >= 3) {
+                    hits = opts.filter(o => o.aliases.some(a => {
+                        const cmp = last ? a.slice(0, Math.max(tok.length, 1)) : a;
+                        return lev(cmp, tok) <= 1;
+                    }));
+                }
+                hits.forEach(o => next.push({
+                    parts: [...s.parts, o.text],
+                    chung: false,
+                    exact: o.aliases.includes(tok)
+                }));
+            });
+            states = next;
+        });
+        return { states, tokens };
+    }
+
+    // Danh sách gợi ý hiển thị
+    function getSuggestions(value) {
+        let { states } = engine(value);
+
+        // Gõ đúng hẳn 1 cấp thì mở luôn cấp tiếp theo
+        if (states.length && states.every(s => s.exact) && states[0].parts.length < 3) {
+            states = states.flatMap(s => {
+                const lvl = s.parts.length;
+                const arr = [];
+                if (lvl === 2) arr.push({ parts: s.parts, chung: true });
+                LEVELS[lvl].forEach(o => arr.push({ parts: [...s.parts, o.text], chung: false }));
+                return arr;
+            });
+        }
+
+        const seen = new Set();
+        const list = [];
+        states.forEach(s => {
+            const text = s.parts.join(' ');
+            if (!text) return;
+            const key = text + '|' + s.chung;
+            if (seen.has(key)) return;
+            seen.add(key);
+            const complete = s.parts.length === 3 || s.chung;
+            let label = '›';
+            if (s.chung) label = 'NGHĨA CHUNG';
+            else if (s.parts.length === 3) label = s.parts[2] === 'Đ' ? 'ĐỨNG (Đ)' : 'NGƯỢC (N)';
+            list.push({ text, fill: complete ? text : text + ' ', label });
+        });
+        return list.slice(0, 12);
+    }
+
+    // Chuẩn hóa chuỗi cuối cùng -> danh sách kết quả hợp lệ
+    function resolveFinal(value) {
+        const v = value.trim();
+        if (!v) return [];
+        const { states, tokens } = engine(v);
+        const out = [];
+        states.forEach(s => {
+            if (s.parts.length === tokens.length && s.parts.length >= 2) {
+                const t = s.parts.join(' ');
+                if (!out.includes(t)) out.push(t);
+            }
+        });
+        return out;
+    }
+
+    // Tự sửa lại ô nhập khi chỉ có 1 khả năng duy nhất
+    function autoFix(inp) {
+        const v = inp.value.trim();
+        if (!v) { inp.classList.remove('ok'); return; }
+        const cands = resolveFinal(v);
+        if (cands.length === 1) {
+            inp.value = cands[0];
+            inp.classList.add('ok');
+            return;
+        }
+        inp.classList.remove('ok');
+        // Mới nhập quân bài (vd "xe") mà chỉ có 1 khả năng -> sửa thành XE
+        const { states, tokens } = engine(v);
+        if (tokens.length === 1 && states.length === 1) inp.value = states[0].parts[0];
+    }
+
+    document.querySelectorAll('.card-input').forEach(inp => {
+        const box = document.createElement('div');
+        box.className = 'sug';
+        inp.parentNode.appendChild(box);
+
+        function render() {
+            inp.classList.remove('ok');
+            const list = getSuggestions(inp.value);
+            box.innerHTML = '';
+            if (!list.length) { box.style.display = 'none'; return; }
+            list.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'sug-item';
+                div.innerHTML = '<span></span><small></small>';
+                div.firstChild.textContent = item.text;
+                div.lastChild.textContent = item.label;
+                // pointerdown + preventDefault: không làm ô nhập mất focus
+                div.addEventListener('pointerdown', e => {
+                    e.preventDefault();
+                    inp.value = item.fill;
+                    inp.focus();
+                    render();
+                    if (item.fill === item.text) inp.classList.add('ok');
+                    if (item.fill === item.text) box.style.display = 'none';
+                });
+                box.appendChild(div);
+            });
+            box.style.display = 'block';
+        }
+
+        inp.addEventListener('input', render);
+        inp.addEventListener('focus', render);
+        inp.addEventListener('blur', () => {
+            setTimeout(() => { box.style.display = 'none'; autoFix(inp); }, 120);
+        });
+        inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const list = getSuggestions(inp.value);
+                if (list.length) { inp.value = list[0].fill; render(); }
+                autoFix(inp);
+            }
+        });
+    });
+
+    /* =====================================================
+       PHẦN 2: TRÍCH XUẤT DATA
+       ===================================================== */
+
+    function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    function extractData() {
+        const inputs = document.querySelectorAll('.card-input');
+        const resultArea = document.getElementById('result-area');
+        let finalResults = [];
+        const lines = DATABASE.normalize('NFC').split('\n');
+
+        inputs.forEach(input => {
+            let val = input.value.trim();
+            if (!val) return;
+
+            // Tự sửa chuẩn trước khi tra cứu
+            const cands = resolveFinal(val);
+            if (cands.length > 1) {
+                finalResults.push("⚠️ CHƯA RÕ: " + val + "\nVui lòng chọn 1 trong: " + cands.join("  |  "));
+                return;
+            }
+            if (cands.length === 0) {
+                finalResults.push("❌ KHÔNG KHỚP DỮ LIỆU: " + val);
+                return;
+            }
+
+            const searchKey = cands[0].normalize('NFC').toUpperCase();
+            input.value = searchKey;
+            input.classList.add('ok');
+
+            const isChung = searchKey.split(' ').length === 2;
+            const keyRe = isChung
+                ? new RegExp('^\\s*(\\d+\\.\\s*)?' + escapeRe(searchKey) + '\\s*:?\\s*$')
+                : new RegExp('^\\s*' + escapeRe(searchKey) + '\\s*:');
+
+            let foundIdx = -1;
+            for (let i = 0; i < lines.length; i++) {
+                if (keyRe.test(lines[i].toUpperCase())) { foundIdx = i; break; }
+            }
+
+            if (foundIdx !== -1) {
+                let segment = [lines[foundIdx]];
+
+                for (let j = foundIdx + 1; j < lines.length; j++) {
+                    let lineText = lines[j].trim();
+                    if (lineText === "") continue;
+
+                    // Gặp dòng nhãn (CHỮ HOA + dấu ":") của lá khác -> DỪNG
+                    const m = lineText.match(/^(\d+\.\s*)?([^:]{1,40}?)\s*:/);
+                    if (m && m[2] === m[2].toUpperCase()) {
+                        if (m[2].trim() !== searchKey) break;
+                    }
+
+                    // Gặp dòng tiêu đề nhóm (vd: 4. PHÁO ĐỎ) -> DỪNG
+                    if (/^\d+\./.test(lineText)) break;
+
+                    segment.push(lines[j]);
+                }
+                finalResults.push(segment.join('\n').trim());
+            } else {
+                finalResults.push("❌ KHÔNG KHỚP DỮ LIỆU: " + searchKey);
+            }
+        });
+
+        resultArea.innerText = finalResults.join("\n\n--------------------\n\n");
+    }
+
+    function copyData() {
+        const text = document.getElementById('result-area').innerText;
+        if (!text) return;
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        alert("Đã sao chép!");
+    }
+</script>
+
+</body>
+</html>

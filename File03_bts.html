@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HỆ THỐNG TRÍCH XUẤT 03</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Mulish:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --moss:      #3d6b4f;
+            --moss-dk:   #254233;
+            --moss-lt:   #e8f2eb;
+            --cream:     #faf8f3;
+            --parch:     #f0ead8;
+            --stone:     #8ea494;
+            --amber:     #b8722a;
+            --cobalt:    #2c5f8a;
+            --cobalt-dk: #1a3d5c;
+            --ink:       #222e28;
+            --border:    #ccddd3;
+            --red:       #a03030;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Mulish', sans-serif;
+            background: #dde8df;
+            min-height: 100vh;
+            padding: 16px 12px 40px;
+            position: relative;
+        }
+
+        /* Subtle background texture */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 20%, rgba(61,107,79,.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 80%, rgba(44,95,138,.05) 0%, transparent 55%);
+            pointer-events: none;
+        }
+
+        /* ── WRAPPER ── */
+        .app {
+            max-width: 520px;
+            margin: 0 auto;
+            background: var(--cream);
+            border-radius: 22px;
+            box-shadow:
+                0 2px 0 rgba(255,255,255,.7) inset,
+                0 10px 40px rgba(37,66,51,.16),
+                0 2px 8px rgba(0,0,0,.06);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: linear-gradient(160deg, var(--moss-dk) 0%, var(--moss) 100%);
+            padding: 24px 22px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; right: 0;
+            height: 20px;
+            background: var(--cream);
+            border-radius: 20px 20px 0 0;
+        }
+        .header-eyebrow {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .22em;
+            color: rgba(255,255,255,.55);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .header h2 {
+            font-family: 'Lora', serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.4;
+            letter-spacing: .03em;
+        }
+        .header h2 span {
+            font-style: italic;
+            color: rgba(255,255,255,.75);
+            font-size: 13px;
+            display: block;
+            margin-top: 3px;
+            font-weight: 400;
+            letter-spacing: .04em;
+        }
+
+        /* ── BODY ── */
+        .body {
+            padding: 22px 18px 26px;
+        }
+
+        /* ── SECTION LABEL ── */
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .16em;
+            color: var(--stone);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── FORM ROWS ── */
+        .form-row {
+            margin-bottom: 11px;
+            position: relative;
+        }
+        .form-row label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            color: var(--moss-dk);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .lbl-num {
+            width: 20px; height: 20px;
+            background: var(--moss);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 10px; font-weight: 800;
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        /* preview chip right of label */
+        .lbl-chip {
+            margin-left: auto;
+            font-size: 10px; font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 20px;
+            background: var(--parch);
+            color: var(--stone);
+            letter-spacing: .03em;
+            transition: background .2s, color .2s;
+            white-space: nowrap;
+        }
+        .lbl-chip.ok { background: var(--moss-lt); color: var(--moss-dk); border: 1px solid #b5d4bc; }
+
+        .input-wrap { position: relative; }
+
+        input.in {
+            width: 100%;
+            padding: 13px 46px 13px 14px;
+            border: 2px solid var(--border);
+            border-radius: 11px;
+            font-family: 'Mulish', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: .04em;
+            background: #fff;
+            color: var(--ink);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        input.in::placeholder { color: #c8d5cb; font-weight: 400; font-size: 14px; }
+        input.in:focus {
+            border-color: var(--moss);
+            box-shadow: 0 0 0 3px rgba(61,107,79,.1);
+        }
+        input.in.done {
+            border-color: var(--moss);
+            background: #f6fbf7;
+        }
+
+        /* ĐỠ badge bên phải */
+        .d-badge {
+            position: absolute;
+            right: 10px; top: 50%;
+            transform: translateY(-50%);
+            width: 28px; height: 28px;
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800;
+            pointer-events: none;
+            transition: all .2s;
+            background: var(--parch); color: #bbb;
+        }
+        .d-badge.active { background: var(--moss-lt); color: var(--moss-dk); }
+
+        /* TƯỚNG/TƯỢNG suggestion */
+        .sug-box {
+            display: none;
+            position: absolute;
+            left: 0; top: calc(100% + 5px);
+            z-index: 50;
+            background: #fff;
+            border: 2px solid var(--moss);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(37,66,51,.16);
+            overflow: hidden;
+            min-width: 200px;
+        }
+        .sug-box.open { display: block; }
+        .sug-ttl {
+            font-size: 9px; font-weight: 700;
+            letter-spacing: .14em; text-transform: uppercase;
+            color: var(--stone);
+            padding: 7px 13px 4px;
+            background: var(--moss-lt);
+        }
+        .sug-item {
+            padding: 12px 15px;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer;
+            border-top: 1px solid var(--moss-lt);
+            color: var(--ink);
+            transition: background .12s;
+            font-family: 'Mulish', sans-serif;
+        }
+        .sug-item:active, .sug-item:hover { background: var(--moss-lt); }
+
+        /* divider */
+        .divider {
+            display: flex; align-items: center; gap: 10px;
+            margin: 16px 0;
+        }
+        .divider span {
+            font-size: 10px; letter-spacing: .12em; font-weight: 600;
+            color: var(--stone); text-transform: uppercase; white-space: nowrap;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+
+        /* ── BUTTONS ── */
+        .btn-group {
+            display: flex; flex-direction: column;
+            gap: 10px; margin-top: 18px;
+        }
+        button.btn {
+            width: 100%; padding: 16px;
+            font-family: 'Mulish', sans-serif;
+            font-size: 15px; font-weight: 800;
+            border: none; border-radius: 13px;
+            color: #fff; cursor: pointer;
+            letter-spacing: .08em; text-transform: uppercase;
+            transition: transform .12s, filter .14s;
+            position: relative; overflow: hidden;
+        }
+        button.btn::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: rgba(255,255,255,0);
+            transition: background .15s;
+        }
+        button.btn:hover::after { background: rgba(255,255,255,.06); }
+        button.btn:active { transform: scale(.975); filter: brightness(.93); }
+
+        .btn-find {
+            background: linear-gradient(135deg, var(--moss-dk), var(--moss));
+            box-shadow: 0 4px 16px rgba(37,66,51,.28);
+        }
+        .btn-copy {
+            background: linear-gradient(135deg, var(--cobalt-dk), var(--cobalt));
+            box-shadow: 0 4px 16px rgba(28,61,92,.24);
+        }
+
+        /* ── OUTPUT ── */
+        #ket-qua {
+            margin-top: 18px;
+            padding: 16px 18px;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            min-height: 64px;
+            white-space: pre-wrap;
+            background: #fff;
+            font-family: 'Mulish', sans-serif;
+            font-size: 15.5px;
+            line-height: 1.75;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        #ket-qua:empty::before {
+            content: 'Kết quả hiển thị tại đây…';
+            color: #ccc;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* footer */
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: var(--stone);
+            padding: 10px 0 2px;
+            letter-spacing: .07em;
+        }
+
+        /* page-load fade in */
+        .app { animation: fadeUp .45s ease both; }
+        @keyframes fadeUp {
+            from { opacity:0; transform: translateY(16px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+
+    <div class="header">
+        <div class="header-eyebrow">STM · Tứ Sắc</div>
+        <h2>HỆ THỐNG TRÍCH XUẤT 03
+            <span>Nhập lá bài · Bấm TÌM để tra cứu</span>
+        </h2>
+    </div>
+
+    <div class="body">
+
+        <div class="section-label">Nhập 4 lá bài</div>
+
+        <!-- FORM 1 -->
+        <div class="form-row">
+            <label>
+                <span class="lbl-num">1</span> Lá 1
+                <span id="chip-v1" class="lbl-chip">—</span>
+            </label>
+            <div class="input-wrap">
+                <input type="text" id="v1" class="in"
+                    placeholder="Ví dụ: TƯỚNG XANH Đ"
+                    autocomplete="off" autocorrect="off" spellcheck="false">
+                <div id="db-v1" class="d-badge">Đ</div>
+                <div id="sug-v1" class="sug-box">
+                    <div class="sug-ttl">Chọn quân bài:</div>
+                    <div class="sug-item" data-for="v1" data-name="TƯỚNG">TƯỚNG</div>
+                    <div class="sug-item" data-for="v1" data-name="TƯỢNG">TƯỢNG</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM 2 -->
+        <div class="form-row">
+            <label>
+                <span class="lbl-num">2</span> Lá 2
+                <span id="chip-v2" class="lbl-chip">—</span>
+            </label>
+            <div class="input-wrap">
+                <input type="text" id="v2" class="in"
+                    placeholder="Ví dụ: SĨ VÀNG Đ"
+                    autocomplete="off" autocorrect="off" spellcheck="false">
+                <div id="db-v2" class="d-badge">Đ</div>
+                <div id="sug-v2" class="sug-box">
+                    <div class="sug-ttl">Chọn quân bài:</div>
+                    <div class="sug-item" data-for="v2" data-name="TƯỚNG">TƯỚNG</div>
+                    <div class="sug-item" data-for="v2" data-name="TƯỢNG">TƯỢNG</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM 3 -->
+        <div class="form-row">
+            <label>
+                <span class="lbl-num">3</span> Lá 3
+                <span id="chip-v3" class="lbl-chip">—</span>
+            </label>
+            <div class="input-wrap">
+                <input type="text" id="v3" class="in"
+                    placeholder="Ví dụ: NGỰA TRẮNG Đ"
+                    autocomplete="off" autocorrect="off" spellcheck="false">
+                <div id="db-v3" class="d-badge">Đ</div>
+                <div id="sug-v3" class="sug-box">
+                    <div class="sug-ttl">Chọn quân bài:</div>
+                    <div class="sug-item" data-for="v3" data-name="TƯỚNG">TƯỚNG</div>
+                    <div class="sug-item" data-for="v3" data-name="TƯỢNG">TƯỢNG</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM 4 -->
+        <div class="form-row">
+            <label>
+                <span class="lbl-num">4</span> Lá 4
+                <span id="chip-v4" class="lbl-chip">—</span>
+            </label>
+            <div class="input-wrap">
+                <input type="text" id="v4" class="in"
+                    placeholder="Ví dụ: CHỐT ĐỎ Đ"
+                    autocomplete="off" autocorrect="off" spellcheck="false">
+                <div id="db-v4" class="d-badge">Đ</div>
+                <div id="sug-v4" class="sug-box">
+                    <div class="sug-ttl">Chọn quân bài:</div>
+                    <div class="sug-item" data-for="v4" data-name="TƯỚNG">TƯỚNG</div>
+                    <div class="sug-item" data-for="v4" data-name="TƯỢNG">TƯỢNG</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-find" onclick="run()">🔍 TÌM Ý NGHĨA</button>
+            <button class="btn btn-copy" onclick="copyResult()">📋 SAO CHÉP KẾT QUẢ</button>
+        </div>
+
+        <div id="ket-qua"></div>
+        <div class="footer">STM · Hệ Thống Trích Xuất File 03</div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  AUTO-CORRECT LOGIC
+//  Quy tắc: File 03 tất cả lá đều là Đ (không có N)
+//  Cấu trúc chuẩn: QUAN MAU Đ  (ví dụ: TƯỚNG XANH Đ)
+// ══════════════════════════════════════════════════════════
+
+const QUAN_LIST = ['TƯỚNG','TƯỢNG','SĨ','XE','PHÁO','NGỰA','CHỐT'];
+const MAU_LIST  = ['XANH','VÀNG','TRẮNG','ĐỎ'];
+
+function removeAccent(s) {
+    return s.normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[đĐ]/g, 'd')
+        .toUpperCase();
+}
+
+// Nhận diện tên quân từ token (không dấu)
+// Trả về: { name: 'TƯỚNG', ambig: false } | { name: null, ambig: true } | null
+function detectQuan(raw) {
+    const u  = raw.toUpperCase().trim();
+    const na = removeAccent(u);
+
+    if (QUAN_LIST.includes(u))      return { name: u,       ambig: false };
+    if (na === 'SI'  || na === 'SY') return { name: 'SĨ',    ambig: false };
+    if (na === 'XE'  || na === 'X')  return { name: 'XE',    ambig: false };
+    if (na.startsWith('PH'))         return { name: 'PHÁO',  ambig: false };
+    if (na.startsWith('NG'))         return { name: 'NGỰA',  ambig: false };
+    if (na.startsWith('CH'))         return { name: 'CHỐT',  ambig: false };
+    if (na.startsWith('SI'))         return { name: 'SĨ',    ambig: false };
+    // TƯỚNG vs TƯỢNG — ambiguous
+    if (na.startsWith('TU') || na.startsWith('TW')) return { name: null, ambig: true };
+
+    return null;
+}
+
+// Nhận diện màu
+function detectMau(raw) {
+    const u  = raw.toUpperCase().trim();
+    const na = removeAccent(u);
+    if (MAU_LIST.includes(u))        return u;
+    if (na.startsWith('XA'))         return 'XANH';
+    if (na.startsWith('VA') || na.startsWith('VAN') || na === 'VAG' || na === 'VG') return 'VÀNG';
+    if (na.startsWith('TR') || na === 'TRANG' || na === 'TAG' || na === 'TG')       return 'TRẮNG';
+    if (na === 'DO' || na === 'DE'  || u === 'ĐỎ' || u === 'ĐO') return 'ĐỎ';
+    return null;
+}
+
+// Parse toàn bộ chuỗi → { quan, mau, ambig }
+// File 03: ký hiệu cuối luôn là Đ nên không cần parse ký hiệu
+function parseInput(str) {
+    const tokens = str.toUpperCase().trim().split(/\s+/).filter(Boolean);
+    let quan = null, mau = null, ambig = false;
+
+    // Thử token cuối là Đ → bỏ qua (không cần)
+    let toks = [...tokens];
+    const last = toks[toks.length - 1];
+    if (last === 'Đ' || last === 'D') toks.pop();
+
+    // Thử token cuối là màu
+    if (toks.length >= 2) {
+        const m = detectMau(toks[toks.length - 1]);
+        if (m) { mau = m; toks.pop(); }
+    }
+
+    // Phần còn lại là tên quân
+    const quanStr = toks.join(' ');
+    if (quanStr) {
+        const qr = detectQuan(quanStr);
+        if (qr) {
+            if (qr.ambig) ambig = true;
+            else quan = qr.name;
+        }
+    }
+
+    // Fallback scan toàn chuỗi
+    if (!mau) {
+        for (const m of MAU_LIST) {
+            if (str.toUpperCase().includes(m)) { mau = m; break; }
+        }
+    }
+    if (!quan && !ambig) {
+        for (const q of QUAN_LIST) {
+            if (str.toUpperCase().includes(q)) { quan = q; break; }
+        }
+    }
+
+    return { quan, mau, ambig };
+}
+
+function buildValue(quan, mau) {
+    const parts = [];
+    if (quan) parts.push(quan);
+    if (mau)  parts.push(mau);
+    parts.push('Đ');
+    return parts.join(' ');
+}
+
+// ── Correct một field (gọi khi Enter hoặc bấm TÌM) ──
+function correctField(id) {
+    const inp = document.getElementById(id);
+    const raw = inp.value.trim();
+    if (!raw) return;
+
+    const p = parseInput(raw);
+    if (p.quan && p.mau) {
+        inp.value = buildValue(p.quan, p.mau);
+        inp.classList.add('done');
+    }
+    updateUI(id);
+    closeSug(id);
+}
+
+// ── Cập nhật chip và badge ──
+function updateUI(id) {
+    const inp   = document.getElementById(id);
+    const chip  = document.getElementById('chip-' + id);
+    const badge = document.getElementById('db-' + id);
+    const p = parseInput(inp.value);
+
+    if (p.quan && p.mau) {
+        chip.className = 'lbl-chip ok';
+        chip.innerText = p.quan.slice(0,3) + ' · ' + p.mau.slice(0,2);
+        badge.className = 'd-badge active';
+    } else if (p.quan || p.mau) {
+        chip.className = 'lbl-chip';
+        chip.innerText = '…';
+        badge.className = 'd-badge';
+    } else {
+        chip.className = 'lbl-chip';
+        chip.innerText = '—';
+        badge.className = 'd-badge';
+    }
+}
+
+// ── Suggestion box ──
+const sugTimers = {};
+function openSug(id)  { document.getElementById('sug-' + id).classList.add('open'); }
+function closeSug(id) { document.getElementById('sug-' + id).classList.remove('open'); }
+
+// ── Setup mỗi form ──
+['v1','v2','v3','v4'].forEach(id => {
+    const inp = document.getElementById(id);
+
+    // 1. Uppercase ngay lập tức khi gõ — không sửa gì thêm
+    inp.addEventListener('input', function() {
+        const pos = this.selectionStart;
+        const up  = this.value.toUpperCase();
+        if (up !== this.value) {
+            this.value = up;
+            try { this.setSelectionRange(pos, pos); } catch(e) {}
+        }
+
+        // Cập nhật badge realtime (chỉ đọc)
+        updateUI(id);
+
+        // Gợi ý TƯỚNG/TƯỢNG sau 1.5s nếu nhận ra TU...
+        clearTimeout(sugTimers[id]);
+        const p = parseInput(this.value);
+        if (p.ambig) {
+            sugTimers[id] = setTimeout(() => openSug(id), 1500);
+        } else {
+            closeSug(id);
+        }
+    });
+
+    // 2. Enter → correct + chuyển field
+    inp.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            correctField(id);
+            const order = ['v1','v2','v3','v4'];
+            const next  = order[order.indexOf(id) + 1];
+            if (next) document.getElementById(next).focus();
+        }
+    });
+
+    // 3. Blur → KHÔNG sửa gì (tránh gây khó chịu khi gõ dở)
+    inp.addEventListener('blur', () => setTimeout(() => closeSug(id), 180));
+});
+
+// Suggestion click
+document.querySelectorAll('.sug-item').forEach(el => {
+    el.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        const id  = this.dataset.for;
+        const nam = this.dataset.name;
+        const inp = document.getElementById(id);
+        const p   = parseInput(inp.value);
+        inp.value = buildValue(nam, p.mau);
+        inp.classList.add('done');
+        closeSug(id);
+        updateUI(id);
+        inp.focus();
+    });
+});
+
+// Đóng suggest khi click ngoài
+document.addEventListener('click', e => {
+    ['v1','v2','v3','v4'].forEach(id => {
+        if (!document.getElementById(id).contains(e.target) &&
+            !document.getElementById('sug-' + id).contains(e.target)) {
+            closeSug(id);
+        }
+    });
+});
+
+// ══════════════════════════════════════════════════════════
+//  DATA + THUẬT TOÁN GỐC — GIỮ NGUYÊN HOÀN TOÀN
+// ══════════════════════════════════════════════════════════
+const THU_VIEN_DATA = `
+MÀU XANH
+1. TƯỚNG XANH Đ :
+Gặp SĨ XANH Đ : Địa vị vững vàng | Tiến thân đúng lúc
+Gặp TƯỢNG XANH Đ : Đã đúng chỗ,nên đi tới | Phòng mưu mô của người đàn bà
+Gặp XE XANH Đ : Thi cử gặp thời,may mắn mọi mặt | Dã tràng se cát,hoài công vô ích
+Gặp PHÁO XANH Đ : Được sự che chở của người có quyền uy | Thành công nhỏ
+Gặp NGỰA XANH Đ : Đừng mơ mộng,nên tin cậy ở sức mình | Càng đi tới càng thấy tức,tốt hơn nên thủ phận
+Gặp CHỐT XANH Đ : Gặp người tốt đẹp mọi việc sẽ thành |  Trước khó,sau dễ
+2. SĨ XANH Đ :
+
+Gặp TƯỢNG XANH Đ : Có lợi lộc mới nói công danh,không lợi lộc nên khoanh tay chờ | Gia đình không yên,mong gì danh phận
+Gặp XE XANH Đ : Công danh như bọt nước,thi cử như trò đùa | Địa vị bị lung lạc
+Gặp PHÁO XANH Đ : Đừng xem thường người bạn gái | Gặp bạn tốt,danh phận ắt đạt được
+Gặp NGỰA XANH Đ : Có tin tốt lành | Đừng tin chuyện người bên đường,tin đồn
+Gặp CHỐT XANH Đ : Gặp chuyện bất ngờ,nhiều sự thích thú | Sắp phải đi xa,đừng do dự
+3. TƯỢNG XANH Đ :
+Gặp XE XANH Đ : Quyền lợi lâm nguy nên dừng chân lại | Có cãi vã,buồn rầu vì công việc chậm trễ
+Gặp PHÁO XANH Đ : Có người mang đề nghị đến,không nên từ chối | Phòng mất của vô ích
+Gặp NGỰA XANH Đ : Gặp lại người bạn gái cũ,việc tốt đẹp sẽ đến | Mọi dàn xếp bất thành
+Gặp CHỐT XANH Đ : Được tin bất lợi | Kết quả vui về việc tiến thân
+
+4. XE XANH Đ :
+Gặp PHÁO XANH Đ : Mọi ý định đều ngưng trệ vì tính do dự | Nên tiến bước,dự định sẽ thành công
+Gặp NGỰA XANH Đ : Danh lợi đều tốt,thi cử thuận lợi | Sẽ có tin tốt lành về việc đang mong
+Gặp CHỐT XANH Đ : Người đi xa sẽ trở về an lành,mang lại niềm vui và tin tốt | Nên nghe người có kinh nghiệm đừng hấp tấp
+
+5. PHÁO XANH Đ :
+Gặp NGỰA XANH Đ : Thành công bất ngờ,danh lợi đi đôi | Mọi hứa hẹn sẽ được thực hiện
+Gặp CHỐT XANH Đ : Càng vẫy vùng thì càng lún sâu | Gặp thời gặp vận,gặp người thương
+6. NGỰA XANH Đ :
+Gặp CHỐT XANH Đ : Gặp bạn tốt đưa đường dẫn lối | Người bạn xưa là những người bạn tốt có thể tin cậy
+MÀU VÀNG
+1. TƯỚNG VÀNG Đ :
+Gặp SĨ VÀNG Đ : Được hưởng tài sản,có hoạnh tài | Hoạnh tài vào tay bất ngờ
+Gặp TƯỢNG VÀNG Đ : Thịnh vượng phát tài,sự nghiệp vững | Phòng kẻ xấu cố tâm rình rập,dòm ngó
+Gặp XE VÀNG Đ : Sự se sua của người đàn bà chỉ mang đến điều bất lợi | Tiền vào tay nên cất giữ hơn là phô trương
+Gặp PHÁO VÀNG Đ : Mất của mất tiền mất cả hi vọng | Thành công trong việc đang làm
+Gặp NGỰA VÀNG Đ : Bôn ba không qua thời vận,ở hiền gặp lành | Chấm dứt được ung nhọt bên trong gia đình
+Gặp Chốt Vàng Đ : Mọi ước vọng đều thành đạt nhờ sự giúp đỡ của người bạn gái | Có quà bất ngờ từ người bạn ngày xưa
+
+2. SĨ VÀNG Đ :
+Gặp TƯỢNG VÀNG Đ : Mưu sự tại nhân,hành sự tại thiên,chạy chọt lắm cũng không kết quả | Nên cậy vào vốn liếng ở trong tay mình đừng hi vọng ở người
+Gặp XE VÀNG Đ : Thành công chắc chắn về tiền bạc | Gặp người đồng hành đắc lực,cộng tác mang nhiều lợi lạc
+Gặp PHÁO VÀNG Đ : Hoạnh tài vào tháng 3 – ra tháng 7, phòng thua lỗ | Không nên thử vận may bằng cờ bạc, càng đánh càng thua to
+Gặp NGỰA VÀNG Đ : Phòng mất của nhiều đáng kể | Những hi vọng về tiền bạc đều tiêu tan
+Gặp CHỐT VÀNG Đ : Nợ hay mòn,con chóng lớn.Trả nợ nhỏ hơn chạy nợ to | Sản nghiệp vào tay sớm là sản nghiệp khó cầm
+
+3. TƯỢNG VÀNG Đ :
+Gặp XE VÀNG Đ : Thất bại keo này ta bày keo khác,thành công theo sau thất bại | Gặp duyên tình cờ làm nên sự nghiệp
+Gặp PHÁO VÀNG Đ : Vận đang lên,lo gì không nên sự nghiệp | Cứu tinh đến đúng lúc,có lợi lạc bất ngờ
+Gặp NGỰA VÀNG Đ : Nên di chuyển,khởi sự hơn là thủ cựu.Đất cũ đãi người mới,ngại gì | Do dự làm mất hết phân nửa cuộc đời,nên hăng hái lên
+Gặp CHỐT VÀNG Đ : Vạn sự khởi đầu nan,gặp việc khó gian nan mới thành công | Sự nghiệp sẽ thành nên hăng hái bước tới
+
+4. XE VÀNG Đ :
+Gặp PHÁO VÀNG Đ : Việc toan tính nên tiến hành ngay | Lợi nhỏ đôi khi cũng giải quyết được việc to
+Gặp NGỰA VÀNG Đ : Có tin rất hay về công việc cũng như tiền bạc | Đừng nghe lời ngon ngọt mà mắc lừa,phòng cạm bẫy
+Gặp CHỐT VÀNG Đ : Đồng tiền do chính mình kiếm được mới bền,đừng hão vọng | Đừng chê người bạn nghèo,thành công nhờ lời khuyên tốt
+
+5. PHÁO VÀNG Đ :
+Gặp NGỰA VÀNG Đ : Đừng ghen mà hỏng việc,sự nghiệp trong tay người đàn bà | Sự nghiệp không thể xây trên nền móng lãng mạn
+Gặp CHỐT VÀNG Đ : Rượu vào lời ra,phòng xa mới nên việc | Kiếm tiền chớ đừng say tiền,dừng chân kịp lúc kẻo có hại
+6. NGỰA VÀNG Đ :
+Gặp CHỐT VÀNG Đ : Mọi trở ngại được san bằng,đã đến lúc nắm thời cơ | Tiền bạc,ước vọng chỉ là thứ bọt bể,thấy đó rồi mất đó
+MÀU TRẮNG
+1. TƯỚNG TRẮNG Đ :
+Gặp SĨ TRẮNG Đ : Với kẻ có quyền thế ta nên tránh trước,đó mới là thượng sách | Cần hết sức thận trọng lúc đi đường
+Gặp TƯỢNG TRẮNG Đ :
+Thắng kiện cũng chưa phải chấm dứt tai nạn,nên lo ngại hậu quả | Phòng khẩu thiệt làm hoen ố danh dự
+Gặp XE TRẮNG Đ : Nên tránh xa một người có tướng lùn,nước da ngăm | Có tang thương,biến đổi
+Gặp PHÁO TRẮNG Đ : Hoa đẹp là hoa có gai,cẩn thận với người,tuy đẹp nhưng lòng có ác ý | Thua thiệt với bạn thân thì không mất,dính dấp với người đẹp qua đường là tiêu tan sự nghiệp
+Gặp NGỰA TRẮNG Đ : Có tin đau buồn bất ngờ | Gặp khổ tâm do người thân gây ra
+Gặp CHỐT TRẮNG Đ : Phòng bệnh nặng kéo dài | Có bực mình vì ghen tuông bóng gió
+2. SĨ TRẮNG Đ :
+Gặp TƯỢNG TRẮNG Đ : Phòng bị phao vu do kẻ tâm phúc gây ra | Đừng chứa chấp người cũng như đồ vật bất minh
+Gặp XE TRẮNG : Bị mất trộm lớn | Nên lánh xa những nơi ồn ào kẻo bị liên lụy
+Gặp PHÁO TRẮNG Đ : Tang khó không thể tránh | Trông chừng con cái,con hư phần lớn do sự chểnh mảng của cha mẹ
+Gặp NGỰA TRẮNG Đ : Phòng sa ngã,tan nát hạnh phúc gia đình | Một phút lỡ lầm ngàn năm ân hận,nên giữ mình
+Gặp CHỐT TRẮNG Đ : Không nên nghe lời đường mật của kẻ khác,kẻo bị lợi dụng với âm mưu quỷ quyệt | Mật ngọt chết ruồi,một câu nhịn chín câu lành
+
+3. TƯỢNG TRẮNG Đ :
+Gặp XE TRẮNG Đ : Không biết bơi đừng tắm sông,qua sông qua đò nên cẩn thận | Bị phụ tình vẫn còn tốt hơn cảnh ông ăn chả bà ăn nem
+Gặp PHÁO TRẮNG Đ : Có sóng gió trong gia đình | Không nên đem tiền mua tình,tiền mất mà tình cũng mất
+Gặp NGỰA TRẮNG Đ : Hãy dàn xếp bằng thái độ tình cảm hơn là để thua thiệt trước pháp lý | Khổ tâm vì bị bỏ rơi
+Gặp CHỐT TRẮNG Đ : Cẩn thận trong việc mua bán,vừa mất của còn lôi thôi | Vàng bạc không mua được ân tình,nên trọng tình nghĩa tào khang
+4. XE TRẮNG Đ :
+Gặp PHÁO TRẮNG Đ : Chuyện ngoài đường đừng mang vào trong nhà,thương người mà hại mình | Có sanh tâm ngay trong gia đình
+Gặp NGỰA TRẮNG Đ : Mất của vì ham lợi | Hôn nhân đổ vỡ
+Gặp CHỐT TRẮNG Đ : Sức khỏe vị đe dọa vì chuyện không đâu | Chơi dao có ngày đứt tay,đi đêm có ngày gặp ma
+5. PHÁO TRẮNG Đ :
+Gặp NGỰA TRẮNG Đ : Có người đàn bà không tốt đem đau thương đến | Không nên nghe lời êm ái của người đàn ông mang lòng lợi dụng
+Gặp CHỐT TRẮNG Đ : Buồn rầu,khổ sở khó tránh | Có tin buồn được đưa đến	
+6. NGỰA TRẮNG Đ :
+Gặp CHỐT TRẮNG Đ : Nên hứa hẹn bằng lời,đừng nên hứa hẹn bằng giấy mực | Phòng tâm địa kẻ bất lương lâu nay ở bên mình
+
+MÀU ĐỎ
+1. TƯỚNG ĐỎ Đ :
+Gặp SĨ ĐỎ Đ : Hôn nhân giàu,hạnh phúc | Nhờ sự giúp đỡ của người đàn bà tốt,hôn nhân sẽ thành tựu
+Gặp TƯỢNG ĐỎ Đ : Đừng ngờ vực lòng tốt của người bạn gái mà bỏ lỡ hạnh phúc | Nhường duyên đôi khi cũng thấy sung sướng
+Gặp XE ĐỎ Đ : Duyên tình cờ trở thành duyên nợ | May mắn mọi mặt trong hôn nhân
+Gặp PHÁO ĐỎ Đ : Mọi ngăn cách trong tình đầu đều được giải quyết | Đừng tham lam,có bà hai còn gấm ghé bà ba
+Gặp NGỰA ĐỎ Đ : Có của hồi môn xứng đáng trong hôn nhân | Gặp lại người bạn xưa,tính chuyện lứa đôi
+Gặp CHỐT ĐỎ Đ : Bạn cũ lâu ngày thăm viếng,cuộc hội ngộ mang nhiều e ấp | Có tin bất ngờ gây rạo rực trong tâm hồn
+
+2. SĨ ĐỎ Đ :
+Gặp TƯỢNG ĐỎ Đ : Cá đã cắn câu sao không giở cần | Ái tình cao đẹp nên giữ mãi
+Gặp XE ĐỎ Đ : Ai bảo rằng tình đầu không thơ mộng | Nũng nịu không phải từ chối mà để được yêu nhiều
+Gặp PHÁO ĐỎ Đ : Trên đường xa gặp được duyên nợ | Nên rút lui thay vì theo đuổi 1 cách tuyệt vọng
+Gặp NGỰA ĐỎ Đ : Dừng chân ở đây là vừa,đừng tiến thêm nữa mà gánh lấy thất bại | Hi sinh 1 chút để bạn mình được hạnh phúc,mình sẽ gặp nhiều hạnh phúc hơn
+Gặp CHỐT ĐỎ Đ : Dù ai gièm pha ,mình hãy hiểu và tin người mình yêu mới khỏi lầm mưu kẻ gian | Yêu mà thiếu độ lượng thì chưa phải thật sự yêu
+		
+3. TƯỢNG ĐỎ Đ :
+Gặp XE ĐỎ Đ : Có cuộc hẹn hò duyên tình | Có cuộc viếng thăm của người mình thầm yêu
+Gặp PHÁO ĐỎ Đ : Vui bất ngờ gây hồi hộp lo sợ nhưng hạnh phúc | Tác hợp đẹp,do sự trung gian của 1 người đàn bà
+Gặp NGỰA ĐỎ Đ : Có cuộc hạnh ngộ với người đẹp e ấp,rụt rè không dám tỏ tình | Có thư từ nói chuyện tâm tình của người bạn
+Gặp CHỐT ĐỎ Đ : Đối diện với người góa vợ ( hay góa chồng ) yêu mình và mình yêu | Có cuộc du lịch và nảy sinh tình cảm
+
+4. XE ĐỎ Đ :
+Gặp PHÁO ĐỎ Đ : Hạnh phúc gia đình,được tin vui về con cái | Sinh con đầu lòng vừa ý
+Gặp NGỰA ĐỎ Đ : Có người đề nghị hôn nhân | Mọi hiểu lầm được san bằng,duyên tình thêm gắn bó
+Gặp CHỐT ĐỎ Đ : Đừng nhìn người qua vẻ bề ngoài,thành thật sẽ gặt hái được hạnh phúc |
+Người mình đang mong đợi sẽ trở về trong ngày gần
+
+5. PHÁO ĐỎ Đ :
+Gặp NGỰA ĐỎ Đ : Được sự thương yêu của người đỡ đầu lớn hơn mình ít tuổi | Cuộc hôn nhân chênh lệch về tuổi tác
+Gặp CHỐT ĐỎ Đ : Yêu 1 người có họ hàng rất gần | Được tỏ tình,nhiều vui vẻ
+6. NGỰA ĐỎ Đ :
+Gặp CHỐT ĐỎ Đ : Vui vẻ đang chờ đón,tình đầu nhiều hứa hẹn |  Hôn nhân được thực hiện sau nhiều.
+    `;
+
+    // ── THUẬT TOÁN GỐC — GIỮ NGUYÊN HOÀN TOÀN ──
+    function timKiem(chu, gap, layBenPhai) {
+        let cleanChu = chu.trim().toUpperCase();
+        let cleanGap = gap.trim().toUpperCase();
+        let lines = THU_VIEN_DATA.split('\n');
+        let indexNhom = -1;
+        for (let i = 0; i < lines.length; i++) {
+            let row = lines[i].trim().toUpperCase();
+            if (row.includes(cleanChu) && row.includes(":")) {
+                if (!row.startsWith("GẶP")) { indexNhom = i; break; }
+            }
+        }
+        if (indexNhom === -1) return null;
+        for (let j = indexNhom + 1; j < lines.length; j++) {
+            let row = lines[j].trim().toUpperCase();
+            if (row.includes(":") && !row.startsWith("GẶP")) break;
+            if (row.startsWith("GẶP") && row.includes(cleanGap)) {
+                let textSauDauHaiCham = lines[j].split(":")[1] || "";
+                let haiVe = textSauDauHaiCham.split("|");
+                if (haiVe.length >= 2) return layBenPhai ? haiVe[1].trim() : haiVe[0].trim();
+                else if (haiVe.length === 1) return haiVe[0].trim();
+            }
+        }
+        return null;
+    }
+
+    function run() {
+        // Correct tất cả 4 form trước khi tra
+        ['v1','v2','v3','v4'].forEach(correctField);
+
+        const inp = [
+            document.getElementById('v1').value,
+            document.getElementById('v2').value,
+            document.getElementById('v3').value,
+            document.getElementById('v4').value
+        ];
+
+        let ketquaFinal = [];
+        for (let i = 0; i < 3; i++) {
+            let L = inp[i], R = inp[i+1];
+            if (!L || !R) continue;
+            let result = timKiem(L, R, true);
+            if (!result) result = timKiem(R, L, false);
+            if (result) {
+                ketquaFinal.push(`Cặp ${i+1}  (${L} — ${R})\n➤ ${result}`);
+            } else {
+                ketquaFinal.push(`Cặp ${i+1}  (${L} — ${R})\n⚠ Không tìm thấy dữ liệu phối hợp`);
+            }
+        }
+        document.getElementById('ket-qua').innerText = ketquaFinal.join("\n\n────────────────────\n\n");
+    }
+
+    function copyResult() {
+        const text = document.getElementById('ket-qua').innerText;
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✔ Đã sao chép!');
+        }).catch(() => {
+            const tmp = document.createElement('textarea');
+            tmp.value = text;
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            document.body.removeChild(tmp);
+            alert('✔ Đã sao chép!');
+        });
+    }
+</script>
+</body>
+</html>

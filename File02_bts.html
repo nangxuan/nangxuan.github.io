@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tra Cứu Tứ Sắc - Đa Cột</title>
+    <style>
+        :root {
+            --bg-zen: #f0f4f2;
+            --panel-bg: #ffffff;
+            --primary-olive: #556b2f;
+            --accent-sage: #8fbc8f;
+            --text-dark: #2f4f4f;
+            --border-soft: #e0e6e3;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-zen);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background: var(--panel-bg);
+            width: 100%;
+            max-width: 800px;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-olive);
+            font-weight: 400;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+        }
+
+        /* Hệ thống lưới 4 cột */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .column-header {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--primary-olive);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 5px;
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            background-color: #fafafa;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        select:focus { border-color: var(--accent-sage); }
+        
+        /* Màu sắc đặc trưng cho từng cột để dễ nhìn */
+        .col-1 { background-color: #fffcf0; }
+        .col-2 { background-color: #f0fff4; }
+        .col-3 { background-color: #f0f5ff; }
+        .col-4 { background-color: #fff0f0; }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #btnSearch { background-color: var(--primary-olive); color: white; }
+        #btnCopy { background-color: var(--accent-sage); color: white; visibility: hidden; }
+
+        button:active { transform: scale(0.98); }
+
+        #resultArea {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fdfdfd;
+            border-radius: 12px;
+            border: 1px dashed var(--accent-sage);
+            display: none;
+            white-space: pre-line;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .card-result {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            color: var(--primary-olive);
+            font-weight: bold;
+            display: block;
+        }
+
+        /* Responsive cho màn hình cực nhỏ */
+        @media (max-width: 480px) {
+            .grid-container { gap: 4px; }
+            select { font-size: 0.75rem; padding: 8px 2px; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Dịch Lý Tứ Sắc</h2>
+
+    <div class="grid-container">
+        <div class="column-header">Quân 1</div>
+        <div class="column-header">Quân 2</div>
+        <div class="column-header">Quân 3</div>
+        <div class="column-header">Quân 4</div>
+
+        <div class="select-group">
+            <select id="type1" class="col-1"><option value="">-Chọn-</option></select>
+            <select id="color1" class="col-1"><option value="">-Màu-</option></select>
+            <select id="pos1" class="col-1"><option value="">-Thế-</option></select>
+        </div>
+        <div class="select-group">
+            <select id="type2" class="col-2"><option value="">-Chọn-</option></select>
+            <select id="color2" class="col-2"><option value="">-Màu-</option></select>
+            <select id="pos2" class="col-2"><option value="">-Thế-</option></select>
+        </div>
+        <div class="select-group">
+            <select id="type3" class="col-3"><option value="">-Chọn-</option></select>
+            <select id="color3" class="col-3"><option value="">-Màu-</option></select>
+            <select id="pos3" class="col-3"><option value="">-Thế-</option></select>
+        </div>
+        <div class="select-group">
+            <select id="type4" class="col-4"><option value="">-Chọn-</option></select>
+            <select id="color4" class="col-4"><option value="">-Màu-</option></select>
+            <select id="pos4" class="col-4"><option value="">-Thế-</option></select>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button id="btnSearch" onclick="processSearch()">TÌM KẾT QUẢ CHUNG</button>
+        <button id="btnCopy" onclick="copyResult()">SAO CHÉP</button>
+    </div>
+
+    <div id="resultArea"></div>
+</div>
+
+<script>
+    const data = {
+        "TƯỚNG": {
+            "XANH": { "Đứng": "Tiến thân,thi cử,mọi khuếch trương khởi sự đều thuận lợi có người đỡ đầu", "Ngược": "Có xung đột với người trên trước,bất lợi mọi mặt" },
+            "VÀNG": { "Đứng": "Thành công chắc chắn về tiền bạc,có quý nhân là người đàn ông giàu sẵn sang giúp đỡ về mọi mặt", "Ngược": "Phòng phản phúc trong gia tộc,mọi sự chậm trễ luôn lẩn quẩn bên mình" },
+            "TRẮNG": { "Đứng": "Mọi vấn đề đều không giải quyết êm thắm,phải ra đến pháp luật,bệnh nặng khó tìm thầy", "Ngược": "Kiện tụng thắng lợi, bệnh hoạn bình phục" },
+            "ĐỎ": { "Đứng": "Có người đàn ông đứng tuổi tận tình giúp đỡ cho hôn nhân thành tựu", "Ngược": "Mọi liên hệ về tình cảm tình bạn tình yêu đều tuyệt vọng,phòng kẻ vô ơn" }
+        },
+        "SĨ": {
+            "XANH": { "Đứng": "Được người đàn bà hoặc cô gái tận tình tiến cử,nhưng phòng ghen tuông làm hỏng công trình", "Ngược": "Bị người đàn bà theo đuổi quấy rầy,lừa dối gây xáo trộn" },
+            "VÀNG": { "Đứng": "Người đàn bà giàu tận tình giúp đỡ trong mọi hoàn cảnh khó khan về tiền bạc", "Ngược": "Đừng ham bóng sắc mà gánh niềm đau,tiêu tiền tan địa vị" },
+            "TRẮNG": { "Đứng": "Phòng ghen tuông gây đổ vỡ trong gia đình,vui không có,buồn tràn ngập", "Ngược": "Nên yên lòng,mọi việc trước sau gì cũng được dàn xếp êm đẹp" },
+            "ĐỎ": { "Đứng": "Bà Nguyệt se duyên,tác hợp xứng lứa vừa đôi,mọi tạo dựng hạnh phúc đều như ý", "Ngược": "Phản phúc gian xảo vô duyên đang theo đuổi quấy rầy.Nhiều đắng cay thử thách" }
+        },
+        "TƯỢNG": {
+            "XANH": { "Đứng": "Có người thanh niên tốt bụng,nhiều uy tín tận tình giúp đỡ,được tin vui,gặp bạn bất ngờ", "Ngược": "Gặp kẻ xảo trá,nhân tình hay ghen,phòng hỏng việc" },
+            "VÀNG": { "Đứng": "Người bạn tốt một mực trung thành,môi giới,hôn nhân đẹp,có địa vị", "Ngược": "Mọi xáo trộn trong công việc xảy ra vì phản trắc,nên đề phòng" },
+            "TRẮNG": { "Đứng": "Đừng tin người bằng cái vỏ bên ngoài,có câu hữu nhan sắc hữu ác đức,tự mình giữ mình là thượng sách.", "Ngược": "Hy vọng thực hiện được sở nguyện,nhất là hôn nhân" },
+            "ĐỎ": { "Đứng": "Tình duyên đẹp,do mình tạo cho mình với người mình yêu và yêu mình", "Ngược": "Mọi sự phũ phàng đều có thể xảy ra cho gia đình và tình yêu" }
+        },
+        "XE": {
+            "XANH": { "Đứng": "Nên có thái độ dứt khoát,đừng rụt rè,chậm chạp mà hỏng cơ hội,nếu cơ hội ấy là 1 cuộc xê dịch", "Ngược": "Mọi trở ngại đang nhen nhúm,phòng thất bại,không nên thay đổi việc làm hay chỗ ở" },
+            "VÀNG": { "Đứng": "Của bất ngờ đến giữa cơn túng ngặt,mọi bối rối sẽ tiêu tan.", "Ngược": "Phòng trộm cắp,mất của to,thua lận" },
+            "TRẮNG": { "Đứng": "Có dấu hiệu sẽ lìa nơi sinh trưởng hoặc có chết chóc,ly thân,ly dị,tan rã gia đình.", "Ngược": "Sau cơn mưa trời lại sang,nên vui vì ngày mai hơn là buồn hôm nay" },
+            "ĐỎ": { "Đứng": "Cầu con sẽ được con lành,nhưng cầu duyên nợ sẽ gặp trái đắng nên đừng cầu làm gì.", "Ngược": "Ân tình phản bội có thể xảy ra bất cứ ở nơi nào" }
+        },
+        "PHÁO": {
+            "XANH": { "Đứng": "Sắp có thay đổi,hoặc đi xa thắng lợi về mọi mặt.Hoặc gặp ý trung nhân trở thành duyên nợ.Nếu thi cử chắc chắn sẽ đỗ cao", "Ngược": "Lá bài hung tin,mọi dự kiến tiến thủ đều nên xếp lại,phòng hoen hố danh dự" },
+            "VÀNG": { "Đứng": "Mọi ý kiến nên thực hiện ngay sẽ thu thập kết quả mỹ mãn", "Ngược": "Đỗ vỡ,tranh chấp về tiền bạc ảnh hưởng đến hôn nhân" },
+            "TRẮNG": { "Đứng": "Pháo nổ ngay trong tâm tư,có xáo trộn về địa vị,danh vọng,nếu không cũng bị mẻ trộm to", "Ngược": "Tự giác hối cải là tâm niệm của kẻ lỡ lầm,nên hiểu nhau để yêu nhau hơn" },
+            "ĐỎ": { "Đứng": "Đừng nên ngập ngừng e ấp,ngưỡng của tình yêu đang sẵn sàng chờ đón", "Ngược": "Hiểu lầm đáng tiếc sẽ xảy ra nhưng được hàn gắn" }
+        },
+        "NGỰA": {
+            "XANH": { "Đứng": "Tương lai huy hoàng đang chờ ngoài ngõ,tình duyên bất ngờ đầy thơ mộng", "Ngược": "Tương đương với giá trị Ngựa Xanh đứng, nhưng lá ngược đầu Ngựa Xanh này gặp ( đi kèm ) lá Ngựa Trắng ( đứng ) thì mọi việc bất thành" },
+            "VÀNG": { "Đứng": "Người bạn gái dí dỏm duyên dáng,đẹp,tốt bụng sẽ xuất hiện bất ngờ,cứu vãn tình thế", "Ngược": "Trở ngại dồn dập cạm bẫy giăng mắc khắp nơi." },
+            "TRẮNG": { "Đứng": "Tình đầu ít suôn sẻ,cay đắng lỡ làng,cạm bẫy đổ vỡ tan nát cõi lòng.", "Ngược": "Mọi vấn đề về tình yêu sẽ được bàn tay đẹp thắt chặt thêm tươi thắm" },
+            "ĐỎ": { "Đứng": "Duyên tình cờ cũng là duyên bất ngờ,đưa đến mọi hạnh phúc tốt đẹp như mơ.", "Ngược": "Phòng tranh giành tình ái mang hậu quả u buồn ray rức" }
+        },
+        "CHỐT": {
+            "XANH": { "Đứng": "Mọi ý định tiến thủ nên ngừng lại,có xáo trộn trong gia đình,kiện tụng,gièm pha,tranh giành.", "Ngược": "Lá bài hứa hẹn nhiều bất ngờ đến ngoài sự tưởng tượng." },
+            "VÀNG": { "Đứng": "Gặp sự gièm pha bêu xấu,gắt gỏng,ganh tị nhưng cứ lặng yên thực hiện theo ý định của mình sẽ thành công .", "Ngược": "Thua lỗ,công nợ lôi cuốn đến tụng đình,hoen hố danh dự." },
+            "TRẮNG": { "Đứng": "Mọi việc đều thất bại,nên tự cứu hơn là chờ đến lúc phải gánh trọn hậu quả.", "Ngược": "Trì hoãn là phương thuốc hay,dùng chạy chữa tình trạng bi đát." },
+            "ĐỎ": { "Đứng": "Tin nhạn bay về tràn ngập vui tươi trong hạnh phúc,duyên thắm tươi.", "Ngược": "Lỡ lầm trong quá khứ sẽ ân hận mãi ở hiện tại và tương lai." }
+        }
+    };
+
+    const types = ["TƯỚNG", "SĨ", "TƯỢNG", "XE", "PHÁO", "NGỰA", "CHỐT"];
+    const colors = ["XANH", "VÀNG", "TRẮNG", "ĐỎ"];
+    const positions = ["Đứng", "Ngược"];
+
+    // Khởi tạo dữ liệu cho các select
+    function init() {
+        for (let i = 1; i <= 4; i++) {
+            const t = document.getElementById(`type${i}`);
+            const c = document.getElementById(`color${i}`);
+            const p = document.getElementById(`pos${i}`);
+            
+            types.forEach(item => t.add(new Option(item, item)));
+            colors.forEach(item => c.add(new Option(item, item)));
+            positions.forEach(item => p.add(new Option(item, item)));
+        }
+    }
+
+    function processSearch() {
+        let finalOutput = "";
+        let hasResult = false;
+
+        for (let i = 1; i <= 4; i++) {
+            const type = document.getElementById(`type${i}`).value;
+            const color = document.getElementById(`color${i}`).value;
+            const pos = document.getElementById(`pos${i}`).value;
+
+            if (type && color && pos) {
+                const text = data[type][color][pos];
+                finalOutput += `• LÁ ${i}: ${type} ${color} (${pos})\n- Giải mã: ${text}\n\n`;
+                hasResult = true;
+            }
+        }
+
+        const resArea = document.getElementById('resultArea');
+        if (hasResult) {
+            resArea.innerText = finalOutput.trim();
+            resArea.style.display = 'block';
+            document.getElementById('btnCopy').style.visibility = 'visible';
+        } else {
+            alert("Vui lòng chọn đủ 3 thông tin (Tên, Màu, Thế) cho ít nhất 1 cột.");
+        }
+    }
+
+    function copyResult() {
+        const text = document.getElementById('resultArea').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Đã sao chép kết quả!");
+        });
+    }
+
+    init();
+</script>
+
+</body>
+</html>

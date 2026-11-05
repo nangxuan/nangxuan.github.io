@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HỆ THỐNG TRÍCH XUẤT 04 - LÁ NGƯỢC (N)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg:          #e8f0eb;
+            --card:        #f7fbf8;
+            --primary:     #1e4d2b;
+            --accent:      #3a7d4e;
+            --accent2:     #6aab7e;
+            --accent3:     #a8d4b4;
+            --border:      #c2deca;
+            --input-bg:    #ffffff;
+            --input-focus: #f0faf3;
+            --label:       #2a5c38;
+            --result-bg:   #f2f9f4;
+            --result-border:#7ec49a;
+            --shadow-card: 0 8px 40px rgba(30,77,43,0.13), 0 2px 8px rgba(30,77,43,0.07);
+            --shadow-inp:  0 2px 10px rgba(30,77,43,0.08);
+            --btn-find1:   #1e4d2b;
+            --btn-find2:   #3a7d4e;
+            --btn-copy1:   #1a3a5c;
+            --btn-copy2:   #2563a8;
+            --gold-light:  #e8d5a3;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 20% 10%, rgba(106,171,126,0.15) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 90%, rgba(30,77,43,0.10) 0%, transparent 55%);
+            min-height: 100vh;
+            padding: 24px 14px 56px;
+            color: var(--primary);
+        }
+
+        /* ── CARD ── */
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: var(--shadow-card);
+            border: 1.5px solid var(--border);
+            overflow: hidden;
+        }
+
+        /* ── HEADER ── */
+        .card-header {
+            background: linear-gradient(140deg, #1a4226 0%, #3a7d4e 60%, #4e9e67 100%);
+            padding: 30px 28px 36px;
+            text-align: center;
+            position: relative;
+        }
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 22px;
+            background: var(--card);
+            border-radius: 20px 20px 0 0;
+        }
+        .header-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: var(--gold-light);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            padding: 4px 16px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-family: 'Playfair Display', serif;
+            color: #ffffff;
+            font-size: clamp(20px, 5.5vw, 30px);
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            line-height: 1.3;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.68);
+            font-size: 13px;
+            letter-spacing: 0.2px;
+        }
+        .subtitle em {
+            color: var(--gold-light);
+            font-style: normal;
+            font-weight: 700;
+        }
+
+        /* ── BODY ── */
+        .card-body { padding: 22px 22px 0; }
+
+        /* ── FORM ITEM ── */
+        .f-item {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .f-label-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 7px;
+        }
+        .f-num {
+            width: 27px; height: 27px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 7px rgba(58,125,78,0.28);
+        }
+        label {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--label);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .f-tag {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            background: rgba(106,171,126,0.14);
+            border: 1px solid var(--accent3);
+            padding: 2px 10px;
+            border-radius: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 13px;
+            font-size: 21px;
+            font-weight: 700;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: var(--input-bg);
+            color: var(--primary);
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            outline: none;
+            letter-spacing: 0.8px;
+            box-shadow: var(--shadow-inp);
+        }
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            background: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(58,125,78,0.14), var(--shadow-inp);
+        }
+        input[type="text"]::placeholder {
+            color: #b0ccb8;
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+        }
+
+        /* ── SUGGEST POPUP ── */
+        .suggest-box {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            z-index: 300;
+            background: #fff;
+            border: 2px solid var(--accent2);
+            border-radius: 14px;
+            box-shadow: 0 12px 36px rgba(30,77,43,0.20);
+            overflow: hidden;
+            min-width: 220px;
+        }
+        .suggest-box.show { display: block; }
+        .suggest-header {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            padding: 9px 16px;
+            color: rgba(255,255,255,0.9);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+        .suggest-btn {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            width: 100%;
+            padding: 13px 16px;
+            font-size: 17px;
+            font-weight: 700;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: none;
+            border: none;
+            border-top: 1px solid #e4f0e8;
+            cursor: pointer;
+            text-align: left;
+            color: var(--primary);
+            transition: background 0.14s, color 0.14s;
+            letter-spacing: 0.5px;
+        }
+        .suggest-btn:hover, .suggest-btn:active {
+            background: var(--result-bg);
+            color: var(--accent);
+        }
+        .s-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0;
+            letter-spacing: 0;
+        }
+        .s-desc {
+            display: flex;
+            flex-direction: column;
+        }
+        .s-name { font-size: 17px; font-weight: 700; color: var(--primary); }
+        .s-hint { font-size: 11px; font-weight: 500; color: var(--accent2); margin-top: 1px; }
+
+        /* ── DIVIDER ── */
+        .divider {
+            border: none;
+            border-top: 1.5px solid var(--border);
+            margin: 20px 0 18px;
+        }
+
+        /* ── BUTTONS ── */
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            padding: 0 22px;
+        }
+        .btn-find, .btn-copy {
+            padding: 17px 20px;
+            font-size: 17px;
+            font-weight: 700;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.13s, box-shadow 0.13s;
+        }
+        .btn-find {
+            background: linear-gradient(135deg, var(--btn-find1) 0%, var(--btn-find2) 100%);
+            box-shadow: 0 5px 18px rgba(30,77,43,0.30);
+        }
+        .btn-find:hover { box-shadow: 0 7px 26px rgba(30,77,43,0.40); }
+        .btn-copy {
+            background: linear-gradient(135deg, var(--btn-copy1) 0%, var(--btn-copy2) 100%);
+            box-shadow: 0 5px 16px rgba(26,58,92,0.24);
+        }
+        .btn-copy:hover { box-shadow: 0 7px 22px rgba(26,58,92,0.34); }
+        .btn-find:active, .btn-copy:active {
+            transform: translateY(3px);
+            box-shadow: none !important;
+        }
+
+        /* ── RESULT ── */
+        #display {
+            margin: 18px 22px 0;
+            padding: 18px 20px;
+            border: 1.5px solid var(--result-border);
+            border-left: 5px solid var(--accent2);
+            border-radius: 14px;
+            min-height: 80px;
+            white-space: pre-wrap;
+            background: var(--result-bg);
+            font-size: 16px;
+            line-height: 1.85;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            box-shadow: inset 0 2px 8px rgba(30,77,43,0.05);
+        }
+        #display:empty::before {
+            content: 'Kết quả sẽ hiển thị tại đây…';
+            color: #aac9b4;
+            font-weight: 400;
+            font-style: italic;
+            font-size: 15px;
+        }
+
+        /* ── FOOTER ── */
+        .card-footer {
+            margin-top: 20px;
+            padding: 14px 22px 20px;
+            text-align: center;
+            color: var(--accent3);
+            font-size: 12px;
+            letter-spacing: 0.3px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 12px 8px 48px; }
+            .card-body { padding: 18px 14px 0; }
+            .action-btns { padding: 0 14px; }
+            #display { margin: 16px 14px 0; font-size: 15px; }
+            input[type="text"] { font-size: 18px; padding: 12px 14px; }
+            .btn-find, .btn-copy { font-size: 15px; padding: 15px; }
+            .card-footer { padding: 12px 14px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="card-header">
+        <div class="header-badge">✦ File 04 ✦</div>
+        <h2>Dò Tìm Ý Nghĩa<br>Lá Ngược (N)</h2>
+        <p class="subtitle">Chuẩn: <em>TÊN QUÂN</em> &nbsp;·&nbsp; <em>MÀU</em> &nbsp;·&nbsp; <em>N</em></p>
+    </div>
+
+    <!-- BODY -->
+    <div class="card-body">
+
+        <div class="f-item">
+            <div class="f-label-row">
+                <div class="f-num">1</div>
+                <label>Lá 1</label>
+                <span class="f-tag">Trái</span>
+            </div>
+            <input type="text" id="m1" placeholder="VD: TƯỚNG ĐỎ N"
+                   oninput="onType(this)" onkeydown="onKeyDown(event,this)" onblur="onBlurInput(this)">
+            <div class="suggest-box" id="sug_m1">
+                <div class="suggest-header">🎴 Bạn muốn chọn quân nào?</div>
+                <button class="suggest-btn" onmousedown="pickSuggest('m1','TƯỚNG')">
+                    <span class="s-icon">Tg</span>
+                    <span class="s-desc"><span class="s-name">TƯỚNG</span><span class="s-hint">Quân cao nhất</span></span>
+                </button>
+                <button class="suggest-btn" onmousedown="pickSuggest('m1','TƯỢNG')">
+                    <span class="s-icon">Tq</span>
+                    <span class="s-desc"><span class="s-name">TƯỢNG</span><span class="s-hint">Quân thứ ba</span></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="f-item">
+            <div class="f-label-row">
+                <div class="f-num">2</div>
+                <label>Lá 2</label>
+            </div>
+            <input type="text" id="m2" placeholder="VD: SĨ VÀNG N"
+                   oninput="onType(this)" onkeydown="onKeyDown(event,this)" onblur="onBlurInput(this)">
+            <div class="suggest-box" id="sug_m2">
+                <div class="suggest-header">🎴 Bạn muốn chọn quân nào?</div>
+                <button class="suggest-btn" onmousedown="pickSuggest('m2','TƯỚNG')">
+                    <span class="s-icon">Tg</span>
+                    <span class="s-desc"><span class="s-name">TƯỚNG</span><span class="s-hint">Quân cao nhất</span></span>
+                </button>
+                <button class="suggest-btn" onmousedown="pickSuggest('m2','TƯỢNG')">
+                    <span class="s-icon">Tq</span>
+                    <span class="s-desc"><span class="s-name">TƯỢNG</span><span class="s-hint">Quân thứ ba</span></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="f-item">
+            <div class="f-label-row">
+                <div class="f-num">3</div>
+                <label>Lá 3</label>
+            </div>
+            <input type="text" id="m3" placeholder="VD: NGỰA ĐỎ N"
+                   oninput="onType(this)" onkeydown="onKeyDown(event,this)" onblur="onBlurInput(this)">
+            <div class="suggest-box" id="sug_m3">
+                <div class="suggest-header">🎴 Bạn muốn chọn quân nào?</div>
+                <button class="suggest-btn" onmousedown="pickSuggest('m3','TƯỚNG')">
+                    <span class="s-icon">Tg</span>
+                    <span class="s-desc"><span class="s-name">TƯỚNG</span><span class="s-hint">Quân cao nhất</span></span>
+                </button>
+                <button class="suggest-btn" onmousedown="pickSuggest('m3','TƯỢNG')">
+                    <span class="s-icon">Tq</span>
+                    <span class="s-desc"><span class="s-name">TƯỢNG</span><span class="s-hint">Quân thứ ba</span></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="f-item">
+            <div class="f-label-row">
+                <div class="f-num">4</div>
+                <label>Lá 4</label>
+                <span class="f-tag">Phải</span>
+            </div>
+            <input type="text" id="m4" placeholder="VD: CHỐT ĐỎ N"
+                   oninput="onType(this)" onkeydown="onKeyDown(event,this)" onblur="onBlurInput(this)">
+            <div class="suggest-box" id="sug_m4">
+                <div class="suggest-header">🎴 Bạn muốn chọn quân nào?</div>
+                <button class="suggest-btn" onmousedown="pickSuggest('m4','TƯỚNG')">
+                    <span class="s-icon">Tg</span>
+                    <span class="s-desc"><span class="s-name">TƯỚNG</span><span class="s-hint">Quân cao nhất</span></span>
+                </button>
+                <button class="suggest-btn" onmousedown="pickSuggest('m4','TƯỢNG')">
+                    <span class="s-icon">Tq</span>
+                    <span class="s-desc"><span class="s-name">TƯỢNG</span><span class="s-hint">Quân thứ ba</span></span>
+                </button>
+            </div>
+        </div>
+
+        <hr class="divider">
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="action-btns">
+        <button class="btn-find" onclick="submitAll()">🔍 TÌM Ý NGHĨA</button>
+        <button class="btn-copy" onclick="copyData()">📋 SAO CHÉP KẾT QUẢ</button>
+    </div>
+
+    <!-- RESULT -->
+    <div id="display"></div>
+
+    <div class="card-footer">✦ Giải trí · Không thương mại ✦</div>
+
+</div>
+
+<script>
+// ==================== THƯ VIỆN DATA (GIỮ NGUYÊN) ====================
+const RANKING = ["TƯỚNG","SĨ","TƯỢNG","XE","PHÁO","NGỰA","CHỐT"];
+
+const DATA_04 = `
+1. TƯỚNG XANH N :
+Gặp SĨ XANH N : Gièm pha,bêu xấu gây trở ngại làm lung lạc địa vị | Mọi tiến thủ đều nên tiến hành thật dè dặt
+Gặp TƯỢNG XANH N : Có thay đổi chỗ ở việc làm hoặc địa vị | Phòng mất mát tiêu hao
+Gặp XE XANH N : Đi xa thiếu bảo đảm | Chưa phải lúc tiến thân
+Gặp PHÁO XANH N : Có ác ý ngầm,âm mưu thọc gậy bánh xe |
+Mưu sự nên chờ vài trăng nữa hãy tiến hành
+Gặp NGỰA XANH N : Công danh bọt bể càng theo đuổi càng tủi thân | Có dấu hiệu bất lợi nên thận trọng
+Gặp CHỐT XANH N : Phòng lao lý,khó minh oan | Sắc đẹp thường liên lụy anh hùng
+2. SĨ XANH N :
+Gặp TƯỢNG XANH N : Có bất đồng ý kiến,gãy đổ và thù hiềm | Thi cử thiếu may mắn.
+Gặp XE XANH N : Gian truân còn dài nếu không gặp người tiến cử | Được tin bất lợi
+Gặp PHÁO XANH N : Đừng ham tranh tụng,thất bại sẽ về mình | Kẻ ganh tị luôn ích kỷ và nguy hiểm
+Gặp NGỰA XANH N : Có sự tranh giành trước mắt,cẩn thận kẻo bị hất chân | Thật kín đáo và chu đáo mới đến đích dù chưa biết thành bại
+Gặp CHỐT XANH N : Gặp ngưng trệ vì sự hứa hẹn suông | Tốt hơn nên tránh nơi trà dư tửu hậu
+3. TƯỢNG XANH N :
+Gặp XE XANH N : Thử 1 lần mới biết mùi phú quý là mùi khó ngửi | Đừng nhẹ dạ mà ân hận suốt đời
+Gặp PHÁO XANH N : Cạm bẫy thường đi đôi với phản bội | Danh vọng do mình,đừng hi vọng ở người
+Gặp NGỰA XANH N : Đừng nghe lời kẻ xấu mà bỏ người bạn tốt | Chậm trễ kéo dài chưa nên hi vọng
+Gặp CHỐT XANH N : Thức đêm mới biết đêm dài | Công danh chưa đến,chạy chọt lắm cũng vậy thôi
+4. XE XANH N :
+Gặp PHÁO XANH N : Phòng gãy đổ giữa chừng | dòi trong xương dòi ra,phòng người trong nhà hơn người ngoài đường
+Gặp NGỰA XANH N : Có cãi vã vì ghen tuông làm hỏng cơ hội tốt | Thua kiện,tiêu tan danh vọng
+Gặp CHỐT XANH N : Thất vọng tiếp theo nước mắt | Nên lánh xa bạn xấu
+5. PHÁO XANH N :
+Gặp NGỰA XANH N : Gặp người đồng hành không chân thật,nên cẩn thận giữ mình | Mọi ước vọng đều tiêu tan vì sự nhúng tay của người đàn bà
+Gặp CHỐT XANH N : Tài không thắng thời,xưa nay là vậy | Hiểu người,biết mình mọi sở nguyện ắt thành
+6. NGỰA XANH N :
+Gặp CHỐT XANH N : Bị từ chối bất ngờ vào phút chót | Địa vị sắp bị lung lay
+MÀU VÀNG
+1. TƯỚNG VÀNG N :
+Gặp SĨ VÀNG N : Tiền vào đến cửa lại trở ra | Sụp đổ vì kẻ tay chân
+Gặp TƯỢNG VÀNG N : Mọi tính toán đều ngưng trệ,phòng kiện tụng | Mất của vì gặp kẻ ác tâm
+Gặp XE VÀNG N : Nên đề phòng người đàn ông có nước da ngăm | Khinh thường người đàn bà sẽ gánh lấy thất bại
+Gặp PHÁO VÀNG N : Đừng bắt cá hai tay,tiền ra tiền,tình ra tình | Mất cơ hội vì tính đa nghi
+Gặp NGỰA VÀNG N : Cờ bạc không có rủi may mà chỉ có sạt nghiệp | Phòng kẻ phỏng tay trên
+Gặp CHỐT VÀNG N : Gặp kẻ đương đầu lợi hại | Gặp bạn bất chánh,xảo trá,quỷ quyệt
+2. SĨ VÀNG :
+Gặp TƯỢNG VÀNG N : Mọi hứa hẹn về tiền bạc đều bị ngăn cản | Giỡn tiền,đùa bạc có ngày hối hận
+Gặp XE VÀNG N : Đừng nên nghĩ đến việc thiếu lương thiện,hậu quả khó lường | Hùn hạp với kẻ mưu mô có ngày trắng tay
+Gặp PHÁO VÀNG N : Kẻ phản phúc đang ở bên cạnh mình | Cạm bẫy giăng mắc cùng khắp
+Gặp NGỰA VÀNG N : Chuyện nhỏ trở thành đại sự,nên thu xếp ngay từ đầu | Người đàn bà thiếu đức hạnh sẽ gây đổ nát gia đình
+Gặp CHỐT VÀNG N : Phòng bệnh hoạn,mọi việc ngưng trệ | Càng theo đuổi lợi nhỏ càng thiệt to
+3. TƯỢNG VÀNG N :
+Gặp XE VÀNG N : Lời khuyên tốt làm phật lòng hơn lời phỉnh nịnh vừa ý | Bế tắc về mọi mặt nên dè dặt
+Gặp PHÁO VÀNG N : Người đàn bà đẹp đáng mến,tận tình giúp đỡ | Vụ ghen tuông vẫn có thể dàn xếp
+Gặp NGỰA VÀNG N : Sắp sinh con | Được tin tức kém vui
+Gặp CHỐT VÀNG N : Thận trọng chữ ký kẻo chuyện người thành chuyện mình | Được tình mất tiền,được tiền mất mình
+4. XE VÀNG N :
+Gặp PHÁO VÀNG N : Khám phá được chuyện u buồn càng thêm tức giận | Chỉ có người đầu ấp tay gối mới biết giữ gìn sự nghiệp
+Gặp NGỰA VÀNG N : Phòng tai nạn ngay trong gia đình | Chuyện không may đến đột ngột
+Gặp CHỐT VÀNG N : Phòng xa là tự vệ chu đáo | Giao phó công việc cho người là giao sự nghiệp cho người
+5. PHÁO VÀNG N :
+Gặp NGỰA VÀNG N : Tin thiếu may mắn về tiền bạc | Chuyện khó thành vì vận chưa hưng
+Gặp CHỐT VÀNG N : Còn trải qua nhiều thử thách nữa | Hết tiền cũng hết tình nghĩa
+6. NGỰA VÀNG N :
+Gặp CHỐT VÀNG N : Phòng bị mất trộm to | Phòng mất của lúc đi đường
+MÀU TRẮNG
+1. TƯỚNG TRẮNG N :
+Gặp SĨ TRẮNG N : Kết bạn với người đàn bà đẹp nhiều uy thế | Được sự mai mối của người tốt đem lại hôn nhân đẹp
+Gặp TƯỢNG TRẮNG N : Dù sóng gió dù ngăn cách hôn nhân cũng thành tựu | Gặp người bạn hiền từng giúp đỡ qua cơn sóng gió
+Gặp XE TRẮNG N : Bệnh lâu ngày gặp thuốc lành | Thắng vụ kiện cam go
+Gặp PHÁO TRẮNG N : Gặp người đàn bà lạ,có lòng hảo tâm | Mọi trở ngại đều chấm dứt
+Gặp NGỰA TRẮNG N : Tranh giành nguy hiểm nhưng thắng lợi sau cùng | Sắp du lịch hay xê dịch nhiều lợi lạc
+Gặp CHỐT TRẮNG N : Nên thử thời vận bằng cách mua vé số | Tái ngộ bất ngờ với người bạn chờ mong
+2. SĨ TRẮNG N :
+Gặp TƯỢNG TRẮNG N : Người xa vắng bỗng dưng trở về | Quà danh dự của người vừa quen
+Gặp XE TRẮNG N : Thành công nhỏ về tiền bạc | Lời khuyên đúng đắn giúp nhiều cho sự thành công
+Gặp PHÁO TRẮNG N : Qua rồi cơn sóng gió,trời êm,bể lặng | Cương quyết sẽ vượt qua mọi chướng ngại
+Gặp NGỰA TRẮNG N : Tin lành về cuộc hôn nhân đang dang dở | Bà con xa không bằng láng giềng gần,có người thật tâm
+Gặp CHỐT TRẮNG N : Có thay đổi nghề nghiệp hợp với khả năng | Hy vọng thành tựu
+3. TƯỢNG TRẮNG N :
+Gặp XE TRẮNG N : Ước vọng sắp thành | Thoát 1 âm mưu
+Gặp PHÁO TRẮNG : Lật ngược được 1 vụ kiện | Có sự mời mọc của người thương
+Gặp NGỰA TRẮNG N : Kết thúc mỹ mãn 1 công việc | Thành công nhờ sự giúp đỡ của người trong gia tộc
+Gặp CHỐT TRẮNG N : Người bạn gái xinh xinh có tấm lòng tốt | Có sự thăm viếng của ân nhân
+4. XE TRẮNG N :
+Gặp PHÁO TRẮNG N : Sự hứa hẹn của người bề trên đã có kết quả | Một sự vu khống bị phơi bày
+Gặp NGỰA TRẮNG N : Kẻ toan hãm hại đã gặp tai nạn | Chấm dứt 1 chuyện đau lòng
+Gặp CHỐT TRẮNG N : Họp mặt với người yêu bị rào đón,nhờ người bạn gái tốt bụng | Hết công nợ nhờ sự giúp đỡ của người xưa
+5. PHÁO TRẮNG N :
+Gặp NGỰA TRẮNG N : Vượt qua 1 sự cám dỗ nguy hiểm | Lột trần 1 âm mưu hãm hại
+Gặp CHỐT TRẮNG N : Được báo tin hưởng gia tài | Được món tiền bất ngờ giữa cơn khốn đốn
+6. NGỰA TRẮNG N :
+Gặp CHỐT TRẮNG N : Kẻ tranh giành đã hồi tâm,muốn hòa giải | Loại được 1 kẻ có manh tâm đang rình rập
+MÀU ĐỎ
+1. TƯỚNG ĐỎ N :
+Gặp SĨ ĐỎ N : Hôn nhân bị đình hoãn vì sự nham hiểm của người đàn bà | Người yêu dứt tình
+Gặp TƯỢNG ĐỎ N : Có tranh giành về tình ái | Chọn lầm người đã san sẻ tình cảm cho người khác
+Gặp XE ĐỎ N : Khổ tâm vì hôn nhân thiếu hạnh phúc | Gặp sự phản bội của bạn bè
+Gặp PHÁO ĐỎ N : Gặp người đàn bà thiếu lương thiện | Mới chập chững yêu đã thấy khổ
+Gặp NGỰA ĐỎ N : Phòng bị quyến rũ nguy hiểm | Ngoại tình với kẻ có gia đình
+Gặp CHỐT ĐỎ N : Có sự ép uổng trong hôn nhân | Tình đầu dang dở vì kém bạc tiền
+2. SĨ ĐỎ N :
+Gặp TƯỢNG ĐỎ N : Gặp bạn phản bội có tà tâm | Khám phá ra người yêu đã có gia đình
+Gặp XE ĐỎ N : Khổ vì sự ra đi của người mình thầm yêu | Có cãi vã trong gia đình
+Gặp PHÁO ĐỎ N : Người trong thân tộc xấu bụng tìm cách hại mình | Người con gái mất nết theo đuổi quấy rầy
+Gặp NGỰA ĐỎ N : Tình yêu bị ngăn cách | Hôn nhân vì tiền không vì tình
+Gặp CHỐT ĐỎ N : Bị thua thiệt vì cạm bẫy của gái lộn sòng | Khổ sở vì trở thành góa bụa
+3. TƯỢNG ĐỎ N :
+Gặp XE ĐỎ N : Khổ tâm vì sự hiểu lầm của gia đình | Hạnh phúc lung lay vì kẻ ném đá giấu tay
+Gặp PHÁO ĐỎ N : Mất vĩnh viễn người yêu | Tình giả dối qua đường
+Gặp NGỰA ĐỎ N : Bị đoạn tình đột ngột | Có tang thương trong gia đạo
+Gặp CHỐT ĐỎ N : Khổ tâm vì người thân thuộc gây ra | Có cãi vã quyết liệt với bạn bè
+4. XE ĐỎ N :
+Gặp PHÁO ĐỎ N : Bị ngộ nhận vì tính rụt rè | Khổ tâm vì phải kết duyên với người quá lớn tuổi
+Gặp NGỰA ĐỎ N : Gặp tình địch lợi hại | Mất người yêu vì quá tin bạn
+Gặp CHỐT ĐỎ N : Tin buồn vì người yêu đi lấy chồng | Đau khổ vì tình đầu bị lừa dối
+5. PHÁO ĐỎ N :
+Gặp NGỰA ĐỎ N : Cảnh éo le cần kiên nhẫn | ân hận vì kẻ đến sau
+Gặp CHỐT ĐỎ N : Thị phi không lay chuyển nổi ý chí | Sầu muộn không đáng kể
+6. NGỰA ĐỎ N :
+Gặp CHỐT ĐỎ N : Bệnh nặng vì thất tình | Lâm nguy vì âm mưu ái tình
+`;
+
+// ==================== THUẬT TOÁN GỐC (GIỮ NGUYÊN) ====================
+function getRankValue(name) {
+    let n = name.toUpperCase();
+    for (let i = 0; i < RANKING.length; i++) { if (n.includes(RANKING[i])) return i; }
+    return 99;
+}
+function searchLogic(chu, gap, gapIsRight) {
+    const lines = DATA_04.split('\n');
+    let currentChu = "", targetChu = chu.toUpperCase().trim();
+    let targetGap = "GẶP " + gap.toUpperCase().trim();
+    for (let i = 0; i < lines.length; i++) {
+        let rawLine = lines[i].trim(); if (!rawLine) continue;
+        let lineUp = rawLine.toUpperCase();
+        if (lineUp.includes(":") && !lineUp.startsWith("GẶP")) {
+            if (lineUp.includes(targetChu)) { currentChu = targetChu; continue; }
+            else { currentChu = ""; }
+        }
+        if (currentChu === targetChu && lineUp.startsWith(targetGap)) {
+            let content = rawLine.split(":")[1]; if (!content) return null;
+            let parts = content.split("|");
+            return gapIsRight ? (parts[1] ? parts[1].trim() : parts[0].trim()) : parts[0].trim();
+        }
+    }
+    return null;
+}
+function runAnalysis() {
+    const inputs = ['m1','m2','m3','m4'].map(id => document.getElementById(id).value.trim());
+    let results = [];
+    for (let i = 0; i < 3; i++) {
+        let A = inputs[i], B = inputs[i+1];
+        if (!A || !B) continue;
+        let val = searchLogic(A, B, true);
+        if (!val && getRankValue(B) <= getRankValue(A)) val = searchLogic(B, A, false);
+        results.push(val
+            ? `Cặp ${i+1}  (${A}  ⟶  ${B})\n➤  ${val}`
+            : `Cặp ${i+1}  (${A}  ⟶  ${B})\n➤  Không có dữ liệu phối hợp phù hợp`
+        );
+    }
+    document.getElementById('display').innerText = results.join("\n\n───────────────────\n\n");
+}
+function copyData() {
+    const res = document.getElementById('display').innerText;
+    if (!res) return;
+    const doCopy = t => { const e=document.createElement('textarea'); e.value=t; e.style.cssText='position:fixed;opacity:0;'; document.body.appendChild(e); e.select(); document.execCommand('copy'); document.body.removeChild(e); };
+    if (navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(res).then(showCopyOK).catch(()=>{doCopy(res);showCopyOK();});
+    else { doCopy(res); showCopyOK(); }
+}
+function showCopyOK() {
+    const btn = document.querySelector('.btn-copy');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ ĐÃ SAO CHÉP!';
+    btn.style.background = 'linear-gradient(135deg,#1a6b3a,#27ae60)';
+    setTimeout(()=>{ btn.innerHTML=orig; btn.style.background=''; }, 2000);
+}
+
+// ==================== AUTO-CORRECT ENGINE ====================
+// Realtime  : uppercase only
+// Gợi ý     : hiện NGAY khi token[0] đủ 3 ký tự mơ hồ TƯ/TU
+// Correct   : chỉ khi bấm TÌM hoặc Enter
+
+const VALID_PIECES = ['TƯỚNG','SĨ','TƯỢNG','XE','PHÁO','NGỰA','CHỐT'];
+const VALID_COLORS = ['XANH','VÀNG','TRẮNG','ĐỎ'];
+
+function removeTones(s) {
+    return s.replace(/[àáâãăạảấầẩẫậắằẳẵặ]/gi,'a').replace(/[èéêẹẻẽếềểễệ]/gi,'e')
+            .replace(/[ìíĩịỉ]/gi,'i').replace(/[òóôõơọỏốồổỗộớờởỡợ]/gi,'o')
+            .replace(/[ùúũưụủứừửữự]/gi,'u').replace(/[ỳýỹỵỷ]/gi,'y').replace(/[đ]/gi,'d')
+            .replace(/[ÀÁÂÃĂẠẢẤẦẨẪẬẮẰẲẴẶ]/g,'A').replace(/[ÈÉÊẸẺẼẾỀỂỄỆ]/g,'E')
+            .replace(/[ÌÍĨỊỈ]/g,'I').replace(/[ÒÓÔÕƠỌỎỐỒỔỖỘỚỜỞỠỢ]/g,'O')
+            .replace(/[ÙÚŨƯỤỦỨỪỬỮỰ]/g,'U').replace(/[ỲÝỸỴỶ]/g,'Y').replace(/[Đ]/g,'D');
+}
+function editDist(a,b) {
+    const m=a.length,n=b.length;
+    const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i?j?0:i:j));
+    for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+        dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+    return dp[m][n];
+}
+
+// Kiểm tra mơ hồ TƯỚNG/TƯỢNG
+function isAmbiguous(token) {
+    if (!token) return false;
+    const up = token.toUpperCase();
+    const t = removeTones(up);
+    if (!t.startsWith('TU') && !up.startsWith('TƯ')) return false;
+    if (t.length < 3) return false;
+    // Nếu ký tự thứ 4 trở đi đã phân biệt được → không còn mơ hồ
+    if (t.length >= 4) {
+        const c4=t[3], up4=up[3]||'';
+        if (up4==='Ớ'||up4==='Ơ'||c4==='N') return false;
+        if (up4==='Ợ'||up4==='Ọ'||c4==='Q'||c4==='G') return false;
+    }
+    return true;
+}
+
+function fixPiece(token) {
+    if (!token) return {result:'',ambiguous:false};
+    const up=token.toUpperCase(), t=removeTones(up);
+    if (VALID_PIECES.includes(up)) return {result:up,ambiguous:false};
+    if (t==='XE') return {result:'XE',ambiguous:false};
+    if (t.startsWith('SI')||up.startsWith('SĨ')) return {result:'SĨ',ambiguous:false};
+    if (t.startsWith('PH')) return {result:'PHÁO',ambiguous:false};
+    if (t.startsWith('NG')) return {result:'NGỰA',ambiguous:false};
+    if (t.startsWith('CH')) return {result:'CHỐT',ambiguous:false};
+    if (t.startsWith('TU')||up.startsWith('TƯ')) {
+        if (isAmbiguous(up)) return {result:up,ambiguous:true};
+        if (t.length>=4) {
+            const c4=t[3],up4=up[3]||'';
+            if (up4==='Ớ'||up4==='Ơ'||c4==='N') return {result:'TƯỚNG',ambiguous:false};
+            if (up4==='Ợ'||up4==='Ọ'||c4==='Q'||c4==='G') return {result:'TƯỢNG',ambiguous:false};
+        }
+        return {result:up,ambiguous:true};
+    }
+    if (t.length>=3) {
+        let best=null,bd=999,sd=999;
+        for (const p of VALID_PIECES){const d=editDist(t,removeTones(p));if(d<bd){sd=bd;bd=d;best=p;}else if(d<sd)sd=d;}
+        if (bd<=2&&sd>bd){
+            if(best==='TƯỚNG'||best==='TƯỢNG') return {result:up,ambiguous:true};
+            return {result:best,ambiguous:false};
+        }
+    }
+    return {result:up,ambiguous:false};
+}
+
+function fixColor(token) {
+    if (!token) return '';
+    const up=token.toUpperCase();
+    if (VALID_COLORS.includes(up)) return up;
+    if (up.length<2) return up;
+    const t=removeTones(up);
+    if (t.startsWith('XA')) return 'XANH';
+    if (t.startsWith('VA')||up.startsWith('VÀ')) return 'VÀNG';
+    if (t.startsWith('TR')) return 'TRẮNG';
+    if (t.startsWith('DO')||up.startsWith('Đ')) return 'ĐỎ';
+    let best=null,bd=999;
+    for(const c of VALID_COLORS){const d=editDist(t,removeTones(c));if(d<bd){bd=d;best=c;}}
+    return (bd<=2&&best)?best:up;
+}
+
+function correctInput(inp) {
+    const raw=inp.value.toUpperCase().trim(); if(!raw) return;
+    const tokens=raw.split(/\s+/).filter(Boolean); if(!tokens.length) return;
+    let out=[], amb=false;
+    const {result:r0,ambiguous:a0}=fixPiece(tokens[0]);
+    out.push(r0||tokens[0]); if(a0) amb=true;
+    if (tokens[1]) out.push(fixColor(tokens[1]));
+    if (tokens[2]) out.push('N');
+    inp.value=out.join(' ');
+    if (amb) showSuggest(inp.id);
+}
+
+// ── Suggest ──
+function showSuggest(id) { const b=document.getElementById('sug_'+id); if(b) b.classList.add('show'); }
+function hideSuggest(id) { const b=document.getElementById('sug_'+id); if(b) b.classList.remove('show'); }
+function hideAllSuggest() { document.querySelectorAll('.suggest-box').forEach(b=>b.classList.remove('show')); }
+
+function pickSuggest(inputId, piece) {
+    const inp=document.getElementById(inputId); if(!inp) return;
+    const tokens=inp.value.toUpperCase().trim().split(/\s+/).filter(Boolean);
+    tokens[0]=piece;
+    inp.value=tokens.join(' ');
+    hideSuggest(inputId);
+    inp.focus();
+    try{inp.setSelectionRange(inp.value.length,inp.value.length);}catch(e){}
+}
+
+// ── Realtime: uppercase + check gợi ý ngay ──
+function onType(inp) {
+    const caret=inp.selectionStart, oldLen=inp.value.length;
+    inp.value=inp.value.toUpperCase();
+    const diff=inp.value.length-oldLen;
+    try{inp.setSelectionRange(caret+diff,caret+diff);}catch(e){}
+
+    // Hiện/ẩn gợi ý ngay lập tức dựa trên token[0]
+    const tokens=inp.value.trim().split(/\s+/).filter(Boolean);
+    if (tokens[0]&&isAmbiguous(tokens[0])) showSuggest(inp.id);
+    else hideSuggest(inp.id);
+}
+
+function onBlurInput(inp) {
+    // Delay nhỏ để mousedown của suggest-btn kịp fire trước
+    setTimeout(()=>hideSuggest(inp.id), 160);
+}
+
+function onKeyDown(e, inp) {
+    if (e.key==='Enter') {
+        e.preventDefault();
+        correctInput(inp);
+        const ids=['m1','m2','m3','m4'];
+        const idx=ids.indexOf(inp.id);
+        if (idx<3) document.getElementById(ids[idx+1]).focus();
+        else submitAll();
+    }
+}
+
+function submitAll() {
+    hideAllSuggest();
+    ['m1','m2','m3','m4'].forEach(id=>{
+        const inp=document.getElementById(id);
+        if(inp.value.trim()) correctInput(inp);
+    });
+    runAnalysis();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,776 @@
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ngũ Linh Tứ Sắc – Thấu Chân Kinh</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-dark: #8b6914;
+  --ink: #0d0d0d;
+  --parchment: #f5edd6;
+  --parchment-dark: #e8d9b5;
+  --red-deep: #8b1a1a;
+  --green-deep: #1a4a2e;
+  --white-card: #e8e8e8;
+  --panel: #1a1208;
+  --panel-light: #241a0a;
+  --border: rgba(201,168,76,0.4);
+  --glow: rgba(201,168,76,0.25);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: var(--ink);
+  min-height: 100vh;
+  padding: 20px 12px 40px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Starfield background */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(139,26,26,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(26,74,46,0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ornamental top border */
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+  z-index: 100;
+}
+
+.wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── TITLE BANNER ─── */
+.title-banner {
+  text-align: center;
+  padding: 28px 20px 22px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--panel-light) 0%, var(--panel) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.title-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent, transparent 20px,
+    rgba(201,168,76,0.02) 20px, rgba(201,168,76,0.02) 21px
+  );
+}
+.title-orn {
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+.title-main {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: clamp(18px, 5vw, 26px);
+  color: var(--gold-light);
+  text-shadow: 0 0 30px rgba(201,168,76,0.5), 0 2px 4px rgba(0,0,0,0.8);
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.title-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 4px;
+  opacity: 0.6;
+}
+.divider-orn {
+  display: flex; align-items: center; gap: 8px;
+  margin: 10px 0 0;
+  color: var(--gold);
+  opacity: 0.4;
+  font-size: 18px;
+}
+.divider-orn::before, .divider-orn::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.divider-orn::after { background: linear-gradient(270deg, transparent, var(--gold)); }
+
+/* ─── CONTROL PANEL ─── */
+.control-panel {
+  background: var(--panel-light);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 18px;
+}
+.control-row { display: flex; gap: 10px; align-items: stretch; }
+
+.select-wrapper {
+  flex: 1;
+  position: relative;
+}
+.select-wrapper::after {
+  content: '▾';
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--gold); pointer-events: none; font-size: 14px;
+}
+select {
+  width: 100%; padding: 13px 32px 13px 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+select:focus { outline: none; border-color: var(--gold); }
+select option { background: var(--panel); color: var(--gold-light); }
+
+.btn-shuffle {
+  padding: 13px 20px;
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+  color: var(--ink);
+  border: 1px solid var(--gold-light);
+  border-radius: 3px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+  text-shadow: none;
+  box-shadow: 0 0 15px rgba(201,168,76,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.btn-shuffle:hover { box-shadow: 0 0 25px rgba(201,168,76,0.5), inset 0 1px 0 rgba(255,255,255,0.2); }
+.btn-shuffle:active { transform: scale(0.97); }
+
+/* ─── SECTION HEADERS ─── */
+.sec-header {
+  display: flex; align-items: center; gap: 12px;
+  margin: 24px 0 12px;
+}
+.sec-header .line { flex: 1; height: 1px; background: var(--border); }
+.sec-header span {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+/* ─── FLIP BUTTONS ─── */
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.btn-step {
+  padding: 10px 0;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  background: var(--panel);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 3px;
+  color: rgba(201,168,76,0.4);
+  cursor: not-allowed;
+  transition: all 0.25s;
+}
+.btn-step:disabled { opacity: 0.35; }
+.btn-step:not(:disabled) {
+  color: var(--gold);
+  border-color: var(--border);
+  cursor: pointer;
+}
+.btn-step.active {
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+  border-color: var(--gold);
+  color: var(--gold-light);
+  box-shadow: 0 0 12px rgba(201,168,76,0.25);
+  animation: pulse-btn 1.5s ease-in-out infinite;
+}
+@keyframes pulse-btn {
+  0%,100% { box-shadow: 0 0 8px rgba(201,168,76,0.2); }
+  50% { box-shadow: 0 0 18px rgba(201,168,76,0.45); }
+}
+.btn-step-13 {
+  grid-column: span 4;
+  padding: 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  background: var(--panel-light);
+  border: 1px solid rgba(139,26,26,0.4);
+  border-radius: 3px;
+  color: rgba(200,100,100,0.4);
+  cursor: not-allowed;
+  transition: all 0.3s;
+}
+.btn-step-13:not(:disabled) {
+  color: #e88080;
+  border-color: rgba(200,80,80,0.6);
+  cursor: pointer;
+}
+.btn-step-13.active {
+  background: linear-gradient(135deg, rgba(139,26,26,0.25), rgba(139,26,26,0.1));
+  color: #ff9999;
+  border-color: #c04040;
+  box-shadow: 0 0 15px rgba(180,40,40,0.3);
+  animation: pulse-red 1.5s ease-in-out infinite;
+}
+@keyframes pulse-red {
+  0%,100% { box-shadow: 0 0 10px rgba(180,40,40,0.25); }
+  50% { box-shadow: 0 0 22px rgba(180,40,40,0.5); }
+}
+
+/* ─── CARD GRID ─── */
+.card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+.card {
+  display: none;
+  height: 88px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.4s;
+  animation: cardReveal 0.4s ease-out;
+}
+@keyframes cardReveal {
+  from { opacity: 0; transform: scale(0.85) rotateY(20deg); }
+  to { opacity: 1; transform: scale(1) rotateY(0deg); }
+}
+
+.num-tag {
+  position: absolute; top: 4px; right: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px; opacity: 0.5; font-weight: 600;
+}
+.card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+.card-gender {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px; font-weight: 600;
+  opacity: 0.85;
+}
+
+/* CARD COLORS */
+.c-Xanh {
+  background: linear-gradient(135deg, #0d2b16, #1a4a2e);
+  border: 1px solid #3a7a4e;
+  color: #6dbe8c;
+  box-shadow: 0 2px 8px rgba(26,74,46,0.4);
+}
+.c-Vang {
+  background: linear-gradient(135deg, #2a1f04, #4a3608);
+  border: 1px solid #c9a84c;
+  color: #e8c97a;
+  box-shadow: 0 2px 8px rgba(201,168,76,0.25);
+}
+.c-Trang {
+  background: linear-gradient(135deg, #1c1c1c, #2e2e2e);
+  border: 1px solid #888;
+  color: #d0d0d0;
+  box-shadow: 0 2px 8px rgba(180,180,180,0.15);
+}
+.c-Do {
+  background: linear-gradient(135deg, #2b0d0d, #4a1a1a);
+  border: 1px solid #c04040;
+  color: #f08080;
+  box-shadow: 0 2px 8px rgba(139,26,26,0.4);
+}
+
+/* HIGHLIGHT card tượng trưng */
+.goc-highlight {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 20px rgba(201,168,76,0.5) !important;
+  transform: scale(1.06);
+  z-index: 10;
+}
+
+/* ─── SOUL GRID ─── */
+#soulGrid .card {
+  height: 88px;
+  border-width: 2px !important;
+}
+#soulGrid .card.c-Xanh { border-color: #6dbe8c !important; box-shadow: 0 0 14px rgba(26,74,46,0.5) !important; }
+#soulGrid .card.c-Vang { border-color: var(--gold-light) !important; box-shadow: 0 0 14px rgba(201,168,76,0.4) !important; }
+#soulGrid .card.c-Trang { border-color: #ccc !important; box-shadow: 0 0 14px rgba(200,200,200,0.3) !important; }
+#soulGrid .card.c-Do { border-color: #f08080 !important; box-shadow: 0 0 14px rgba(180,50,50,0.5) !important; }
+
+/* ─── KHÓM ─── */
+.khom-block {
+  background: var(--panel-light);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.khom-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+/* ─── BUTTONS ─── */
+.btn-copy {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, #3a2a0a, #5a4010, #3a2a0a);
+  color: var(--gold-light);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 22px;
+  transition: all 0.3s;
+  box-shadow: 0 0 15px rgba(201,168,76,0.2);
+}
+.btn-copy:hover { box-shadow: 0 0 25px rgba(201,168,76,0.4); }
+.btn-copy:active { transform: scale(0.98); }
+
+.ai-row { display: flex; gap: 10px; margin-top: 12px; }
+.btn-ai {
+  flex: 1; padding: 13px;
+  border: 1px solid;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.btn-gemini {
+  background: rgba(26,115,232,0.1);
+  color: #6ab4ff;
+  border-color: rgba(26,115,232,0.4);
+}
+.btn-gemini:hover { background: rgba(26,115,232,0.2); }
+.btn-other {
+  background: rgba(200,200,200,0.06);
+  color: #bbb;
+  border-color: rgba(200,200,200,0.2);
+}
+.btn-other:hover { background: rgba(200,200,200,0.12); }
+
+.ai-note {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: rgba(201,168,76,0.6);
+  text-align: center;
+  margin-top: 12px;
+  line-height: 1.6;
+  padding: 0 8px;
+}
+
+/* Lá Tượng Trưng thứ 13 container */
+#symbol13 { display: flex; justify-content: center; margin-bottom: 14px; }
+#symbol13 .card { width: 22%; min-width: 70px; }
+
+/* fade-in section */
+#gamePlay { animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+#finalReport { animation: fadeIn 0.5s ease; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--gold-dark); color: var(--ink);
+  padding: 12px 24px; border-radius: 4px;
+  font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 1px;
+  opacity: 0; transition: all 0.3s; z-index: 999; white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- TITLE -->
+  <div class="title-banner">
+    <div class="title-orn">✦ &nbsp; Huyền Học Phương Đông &nbsp; ✦</div>
+    <div class="title-main">Ngũ Linh Tứ Sắc</div>
+    <div class="title-sub">Thấu Chân Kinh</div>
+    <div class="divider-orn">⬡</div>
+  </div>
+
+  <!-- CONTROL -->
+  <div class="control-panel">
+    <div class="control-row">
+      <div class="select-wrapper">
+        <select id="userChoice">
+          <option value="Xanh">✦ CÔNG DANH — XANH LÁ</option>
+          <option value="Vàng">✦ TÀI LỘC — VÀNG / ĐẤT</option>
+          <option value="Trắng">✦ GIA ĐẠO — TRẮNG / XÁM</option>
+          <option value="Đỏ">✦ TÌNH DUYÊN — ĐỎ</option>
+        </select>
+      </div>
+      <button class="btn-shuffle" onclick="setupNgulinh()">XÀO BÀI</button>
+    </div>
+  </div>
+
+  <!-- GAMEPLAY -->
+  <div id="gamePlay" style="display:none;">
+    <div class="btn-grid" id="buttonArea"></div>
+
+    <div class="sec-header"><div class="line"></div><span>TRẬN PHÁP 12 LÁ</span><div class="line"></div></div>
+    <div id="symbol13"></div>
+    <div class="card-grid" id="mainMatrix"></div>
+
+    <div id="finalReport" style="display:none;">
+      <div class="sec-header"><div class="line"></div><span>NGŨ LÁ LINH HỒN</span><div class="line"></div></div>
+      <div id="soulGrid" class="card-grid"></div>
+
+      <div id="khomSection" style="margin-top:20px;"></div>
+
+      <button class="btn-copy" onclick="copyToClipboard()">📜 &nbsp; SAO CHÉP TRẬN PHÁP</button>
+
+      <div class="ai-row">
+        <button class="btn-ai btn-gemini" onclick="window.open('https://g.co/gemini/share/bc207ab4b2bf','_blank')">Gemini Giải Bài</button>
+        <button class="btn-ai btn-other" onclick="window.open('https://chatgpt.com/share/69cce7ea-a670-8323-9ee2-1707b6012235','_blank')">AI Khác Giải Bài</button>
+      </div>
+      <div class="ai-note">Dán dữ liệu đã Sao Chép vào hội thoại AI<br>để được luận giải nghĩa Trận Pháp</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">✦ Đã sao chép Trận Pháp ✦</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   SECURE RANDOM & FISHER-YATES SHUFFLE
+   ─ Dùng crypto.getRandomValues() (cấp độ mật mã học)
+   ─ Fisher-Yates: mọi hoán vị xác suất đúng bằng 1/n!
+   ─ KHÔNG dùng arr.sort(() => Math.random()-0.5) — bị bias V8
+═══════════════════════════════════════════════════════════════ */
+function secureRandom() {
+  const buf = new Uint32Array(1);
+  window.crypto.getRandomValues(buf);
+  return buf[0] / (0xFFFFFFFF + 1); // [0, 1)
+}
+
+function secureShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(secureRandom() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+let state = { matrix: [], tuong: null, css: '', colorName: '', souls: [], khoms: [] };
+
+function getCssClass(val) {
+  return { 'Xanh':'c-Xanh', 'Vàng':'c-Vang', 'Trắng':'c-Trang', 'Đỏ':'c-Do' }[val] || '';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SETUP — Đúng phương pháp "Bỏ 3 Lấy 1"
+   ──────────────────────────────────────────────────────────────
+   GĐ 1 — Bộ 28 lá đã xào (Fisher-Yates + crypto):
+     Lần 1-7: bỏ 3 lên B, lấy lá 4 → vị trí 1..7
+     (28 - 7×4 = 0 → tay hết bài)
+
+   GĐ 2 — Gom 21 lá ở B, xào lại (Fisher-Yates + crypto):
+     Lần 8-12: bỏ 3 lên B, lấy lá 4 → vị trí 8..12
+     Sau lần 12: tay còn đúng 1 lá → Lá Tượng Trưng
+
+   3 KHÓM — Gom 12 lá trên trục xào kỹ lại (Fisher-Yates + crypto), rồi chia:
+     Khóm 1 (Quá Khứ):   lá mới 1-4
+     Khóm 2 (Hiện Tại):  lá mới 5-8
+     Khóm 3 (Tương Lai): lá mới 9-12
+═══════════════════════════════════════════════════════════════ */
+function setupNgulinh() {
+  const sel = document.getElementById('userChoice');
+  const col = sel.value;
+  state.colorName = col.toUpperCase();
+  state.css = getCssClass(col);
+
+  const NAMES = ['TƯỚNG','SĨ','TƯỢNG','XE','PHÁO','NGỰA','CHỐT'];
+
+  // 1. Tạo 28 lá, giới tính ngẫu nhiên bằng crypto
+  let deck = [];
+  NAMES.forEach(n => {
+    for (let i = 0; i < 4; i++) {
+      deck.push({ n, f: secureRandom() > 0.5 ? 'Đ' : 'N' });
+    }
+  });
+
+  // 2. Xào kỹ lần đầu (Fisher-Yates + crypto)
+  deck = secureShuffle(deck);
+
+  // 3. Thực hiện đúng phương pháp "Bỏ 3 Lấy 1"
+  state.matrix = [];
+  let hand = [...deck];   // Xấp bài trên tay
+  let sideB = [];         // Đống B (bài đã bỏ ra)
+
+  for (let round = 0; round < 12; round++) {
+
+    // Nếu hết bài trên tay → gom B xào lại (Fisher-Yates + crypto), reset
+    if (hand.length === 0) {
+      hand = secureShuffle(sideB);
+      sideB = [];
+    }
+
+    // Bỏ 3 lá lên B — nếu giữa chừng hết tay thì gom B xào tiếp
+    for (let skip = 0; skip < 3; skip++) {
+      if (hand.length === 0) {
+        hand = secureShuffle(sideB);
+        sideB = [];
+      }
+      sideB.push(hand.shift());
+    }
+
+    // Đảm bảo còn lá để lấy
+    if (hand.length === 0) {
+      hand = secureShuffle(sideB);
+      sideB = [];
+    }
+
+    // Lấy lá thứ 4 → đặt vào ma trận
+    state.matrix.push(hand.shift());
+  }
+
+  // 4. Lá còn lại trên tay (sau 12 lần) → Lá Tượng Trưng
+  //    Theo đúng phương pháp: sau lần 12 tay còn đúng 1 lá
+  if (hand.length === 0) {
+    hand = secureShuffle(sideB);
+    sideB = [];
+  }
+  state.tuong = hand.shift();
+
+  // ── Reset UI ──
+  document.getElementById('gamePlay').style.display = 'block';
+  document.getElementById('finalReport').style.display = 'none';
+  document.getElementById('symbol13').innerHTML = '';
+
+  let btnH = '';
+  for (let i = 1; i <= 12; i++) {
+    btnH += `<button id="btn${i}" class="btn-step ${i===1?'active':''}" onclick="flipCard(${i})" ${i!==1?'disabled':''}>Lần ${i}</button>`;
+  }
+  btnH += `<button id="btn13" class="btn-step-13" onclick="flipCard(13)" disabled>✦ Lần 13: Lá Tượng Trưng ✦</button>`;
+  document.getElementById('buttonArea').innerHTML = btnH;
+
+  let gridH = '';
+  for (let i = 12; i >= 1; i--) {
+    gridH += `<div id="card${i}" class="card ${state.css}">
+      <span class="num-tag">${i}</span>
+      <div class="card-name"></div>
+      <div class="card-gender"></div>
+    </div>`;
+  }
+  document.getElementById('mainMatrix').innerHTML = gridH;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FLIP CARD
+═══════════════════════════════════════════════════════════════ */
+function flipCard(n) {
+  const btn = document.getElementById('btn' + n);
+  btn.disabled = true;
+  btn.classList.remove('active');
+
+  if (n <= 12) {
+    const c = document.getElementById('card' + n);
+    const d = state.matrix[n - 1];
+    c.querySelector('.card-name').textContent = d.n;
+    c.querySelector('.card-gender').textContent = d.f;
+    c.style.display = 'flex';
+    const next = document.getElementById('btn' + (n + 1));
+    if (next) { next.disabled = false; next.classList.add('active'); }
+  } else {
+    processResults();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROCESS RESULTS
+   ─ Tìm lá gần vị trí 12 nhất cùng tên → Tượng Trưng
+   ─ Đếm lùi 5 bước × 5 lần (gối đầu) → 5 Lá Linh Hồn
+   ─ Gom 12 lá xào kỹ lại (Fisher-Yates + crypto) rồi chia 3 Khóm
+═══════════════════════════════════════════════════════════════ */
+function processResults() {
+  /* ── Trục hiển thị: 12-11-10-9-8-7-6-5-4-3-2-1(GỐC)
+     state.matrix[0] = lá vị trí 1 (GỐC), state.matrix[11] = lá vị trí 12
+     Ta dùng mảng fullArr theo đúng thứ tự vị trí 1..12 (hoặc 1..13)
+     fullArr[0] = vị trí 1, fullArr[11] = vị trí 12
+     "Gần vị trí 12 nhất" = index lớn nhất trong fullArr                */
+
+  let gIdx = -1; // index 0-based trong fullArr (= vị trí - 1)
+  for (let i = 11; i >= 0; i--) {
+    if (state.matrix[i].n === state.tuong.n) { gIdx = i; break; }
+  }
+
+  let fullArr = [...state.matrix]; // index 0 = vị trí 1, index 11 = vị trí 12
+
+  if (gIdx === -1) {
+    // Không trùng → Tượng Trưng đứng ở vị trí 13 (CỰC TRÁI, nối thêm vào đầu mảng)
+    // fullArr sẽ là [vị trí1, vị trí2, ..., vị trí12, vị trí13]
+    fullArr.push(state.tuong);
+    gIdx = 12; // index 0-based của vị trí 13
+    document.getElementById('symbol13').innerHTML =
+      `<div class="card ${state.css} goc-highlight" style="display:flex; width:22%; min-width:68px;">
+        <span class="num-tag">13</span>
+        <div class="card-name">${state.tuong.n}</div>
+        <div class="card-gender">${state.tuong.f}</div>
+      </div>`;
+  } else {
+    // Highlight lá tương ứng trong lưới 12 lá (card id = gIdx+1)
+    document.getElementById('card' + (gIdx + 1)).classList.add('goc-highlight');
+  }
+
+  /* ── 5 Lá Linh Hồn ──────────────────────────────────────────
+     Trục đếm: 12-11-10-...-2-1-12-11-... (đếm NGƯỢC về GỐC, vòng lại)
+     Quy tắc:
+       Lần 1: Lá Tượng Trưng = bước 1, đếm thêm 4 bước ngược → lùi 4
+       Lần 2+: gối đầu = lá liền sau lá vừa chọn (lùi 1) rồi đếm thêm 4 = tổng lùi 5
+     Ví dụ Tượng Trưng vị trí 2 (len=12): 10, 5, 12, 7, 2                */
+
+  state.souls = [];
+  // Chuyển sang 1-based để dễ theo dõi
+  let cursorPos = gIdx + 1; // vị trí 1-based (1..len)
+  const lenF = fullArr.length;
+  for (let i = 0; i < 5; i++) {
+    const step = (i === 0) ? 4 : 5; // lần 1 lùi 4, lần sau lùi 5
+    cursorPos = cursorPos - step;
+    if (cursorPos <= 0) cursorPos += lenF;
+    state.souls.push(fullArr[cursorPos - 1]);
+  }
+
+  let soulH = '';
+  state.souls.forEach((s, i) => {
+    soulH += `<div class="card ${state.css}" style="display:flex;">
+      <span class="num-tag">L${i+1}</span>
+      <div class="card-name">${s.n}</div>
+      <div class="card-gender">${s.f}</div>
+    </div>`;
+  });
+  document.getElementById('soulGrid').innerHTML = soulH;
+
+  /* ── 3 KHÓM — Gom 12 lá trên trục, XÀO KỸ lại, rồi chia ────
+     Theo đúng phương pháp: 12 lá xếp trên trục được gom lại xào thật kỹ
+     sau đó chia thứ tự mới cho 3 khóm × 4 lá.
+     Dùng lại state.matrix (luôn đúng 12 lá, không bao gồm lá thứ 13).  */
+  const reshuffled = secureShuffle([...state.matrix]);
+
+  state.khoms = [];
+  const labels = ['QUÁ KHỨ', 'HIỆN TẠI', 'TƯƠNG LAI'];
+  let khomH = '';
+
+  for (let i = 0; i < 3; i++) {
+    const group = reshuffled.slice(i * 4, i * 4 + 4);
+    state.khoms.push(group);
+    khomH += `<div class="khom-block">
+      <div class="khom-label">✦ &nbsp; KHÓM ${i+1} — ${labels[i]}</div>
+      <div class="card-grid">`;
+    group.forEach((item, j) => {
+      khomH += `<div class="card ${state.css}" style="display:flex;">
+        <span class="num-tag">${i*4+j+1}</span>
+        <div class="card-name">${item.n}</div>
+        <div class="card-gender">${item.f}</div>
+      </div>`;
+    });
+    khomH += `</div></div>`;
+  }
+
+  document.getElementById('khomSection').innerHTML = khomH;
+  document.getElementById('finalReport').style.display = 'block';
+  setTimeout(() => document.getElementById('finalReport').scrollIntoView({ behavior:'smooth', block:'start' }), 120);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COPY TO CLIPBOARD
+═══════════════════════════════════════════════════════════════ */
+function copyToClipboard() {
+  const sel = document.getElementById('userChoice');
+  const topicLabel = sel.options[sel.selectedIndex].text.replace('✦ ', '').trim();
+
+  let text = `╔══════════════════════════════╗\n`;
+  text += `   NGŨ LINH TỨ SẮC — TRẬN PHÁP\n`;
+  text += `   CHỦ ĐỀ: ${topicLabel}\n`;
+  text += `╚══════════════════════════════╝\n\n`;
+
+  text += `【 5 LÁ LINH HỒN 】\n`;
+  state.souls.forEach((s, i) => {
+    text += `  ${i+1}. ${s.n} ${state.colorName} ${s.f}\n`;
+  });
+
+  const labels = ['QUÁ KHỨ', 'HIỆN TẠI', 'TƯƠNG LAI'];
+  state.khoms.forEach((k, idx) => {
+    text += `\n【 KHÓM ${idx+1} — ${labels[idx]} 】\n`;
+    text += `  1. ${k[0].n} ${state.colorName} ${k[0].f}   2. ${k[1].n} ${state.colorName} ${k[1].f}\n`;
+    text += `  3. ${k[2].n} ${state.colorName} ${k[2].f}   4. ${k[3].n} ${state.colorName} ${k[3].f}\n`;
+  });
+
+  navigator.clipboard.writeText(text)
+    .then(() => showToast())
+    .catch(err => alert('Lỗi sao chép: ' + err));
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
