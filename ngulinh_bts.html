@@ -2,8 +2,9 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Ngũ Linh Tứ Sắc – Thấu Chân Kinh</title>
+<!-- Mở khóa pinch-to-zoom cho Smartphone -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>Ngũ Linh Tứ Sắc – Thấu Chân Tâm</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -54,8 +55,9 @@ body::after {
   z-index: 100;
 }
 
+/* Mở rộng max-width giúp giao diện thoáng hơn */
 .wrap {
-  max-width: 480px;
+  max-width: 650px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -433,6 +435,25 @@ select option { background: var(--panel); color: var(--gold-light); }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--ink); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+
+/* ─── TỐI ƯU ĐỌC TRÊN SMARTPHONE ─── */
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
+    padding: 10px 8px 30px;
+  }
+  .wrap {
+    max-width: 100%;
+  }
+  .khom-block {
+    padding: 12px 10px !important;
+  }
+  /* Tăng cỡ chữ kết quả trả về từ các module */
+  .khom-block div {
+    font-size: 15px !important;
+    line-height: 1.7 !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -493,14 +514,11 @@ select option { background: var(--panel); color: var(--gold-light); }
 <script>
 /* ═══════════════════════════════════════════════════════════════
    SECURE RANDOM & FISHER-YATES SHUFFLE
-   ─ Dùng crypto.getRandomValues() (cấp độ mật mã học)
-   ─ Fisher-Yates: mọi hoán vị xác suất đúng bằng 1/n!
-   ─ KHÔNG dùng arr.sort(() => Math.random()-0.5) — bị bias V8
 ═══════════════════════════════════════════════════════════════ */
 function secureRandom() {
   const buf = new Uint32Array(1);
   window.crypto.getRandomValues(buf);
-  return buf[0] / (0xFFFFFFFF + 1); // [0, 1)
+  return buf[0] / (0xFFFFFFFF + 1);
 }
 
 function secureShuffle(arr) {
@@ -523,19 +541,6 @@ function getCssClass(val) {
 
 /* ═══════════════════════════════════════════════════════════════
    SETUP — Đúng phương pháp "Bỏ 3 Lấy 1"
-   ──────────────────────────────────────────────────────────────
-   GĐ 1 — Bộ 28 lá đã xào (Fisher-Yates + crypto):
-     Lần 1-7: bỏ 3 lên B, lấy lá 4 → vị trí 1..7
-     (28 - 7×4 = 0 → tay hết bài)
-
-   GĐ 2 — Gom 21 lá ở B, xào lại (Fisher-Yates + crypto):
-     Lần 8-12: bỏ 3 lên B, lấy lá 4 → vị trí 8..12
-     Sau lần 12: tay còn đúng 1 lá → Lá Tượng Trưng
-
-   3 KHÓM — Gom 12 lá trên trục xào kỹ lại (Fisher-Yates + crypto), rồi chia:
-     Khóm 1 (Quá Khứ):   lá mới 1-4
-     Khóm 2 (Hiện Tại):  lá mới 5-8
-     Khóm 3 (Tương Lai): lá mới 9-12
 ═══════════════════════════════════════════════════════════════ */
 function setupNgulinh() {
   const sel = document.getElementById('userChoice');
@@ -545,7 +550,6 @@ function setupNgulinh() {
 
   const NAMES = ['TƯỚNG','SĨ','TƯỢNG','XE','PHÁO','NGỰA','CHỐT'];
 
-  // 1. Tạo 28 lá, giới tính ngẫu nhiên bằng crypto
   let deck = [];
   NAMES.forEach(n => {
     for (let i = 0; i < 4; i++) {
@@ -553,23 +557,17 @@ function setupNgulinh() {
     }
   });
 
-  // 2. Xào kỹ lần đầu (Fisher-Yates + crypto)
   deck = secureShuffle(deck);
 
-  // 3. Thực hiện đúng phương pháp "Bỏ 3 Lấy 1"
   state.matrix = [];
-  let hand = [...deck];   // Xấp bài trên tay
-  let sideB = [];         // Đống B (bài đã bỏ ra)
+  let hand = [...deck];
+  let sideB = [];
 
   for (let round = 0; round < 12; round++) {
-
-    // Nếu hết bài trên tay → gom B xào lại (Fisher-Yates + crypto), reset
     if (hand.length === 0) {
       hand = secureShuffle(sideB);
       sideB = [];
     }
-
-    // Bỏ 3 lá lên B — nếu giữa chừng hết tay thì gom B xào tiếp
     for (let skip = 0; skip < 3; skip++) {
       if (hand.length === 0) {
         hand = secureShuffle(sideB);
@@ -577,26 +575,19 @@ function setupNgulinh() {
       }
       sideB.push(hand.shift());
     }
-
-    // Đảm bảo còn lá để lấy
     if (hand.length === 0) {
       hand = secureShuffle(sideB);
       sideB = [];
     }
-
-    // Lấy lá thứ 4 → đặt vào ma trận
     state.matrix.push(hand.shift());
   }
 
-  // 4. Lá còn lại trên tay (sau 12 lần) → Lá Tượng Trưng
-  //    Theo đúng phương pháp: sau lần 12 tay còn đúng 1 lá
   if (hand.length === 0) {
     hand = secureShuffle(sideB);
     sideB = [];
   }
   state.tuong = hand.shift();
 
-  // ── Reset UI ──
   document.getElementById('gamePlay').style.display = 'block';
   document.getElementById('finalReport').style.display = 'none';
   document.getElementById('symbol13').innerHTML = '';
@@ -642,29 +633,18 @@ function flipCard(n) {
 
 /* ═══════════════════════════════════════════════════════════════
    PROCESS RESULTS
-   ─ Tìm lá gần vị trí 12 nhất cùng tên → Tượng Trưng
-   ─ Đếm lùi 5 bước × 5 lần (gối đầu) → 5 Lá Linh Hồn
-   ─ Gom 12 lá xào kỹ lại (Fisher-Yates + crypto) rồi chia 3 Khóm
 ═══════════════════════════════════════════════════════════════ */
 function processResults() {
-  /* ── Trục hiển thị: 12-11-10-9-8-7-6-5-4-3-2-1(GỐC)
-     state.matrix[0] = lá vị trí 1 (GỐC), state.matrix[11] = lá vị trí 12
-     Ta dùng mảng fullArr theo đúng thứ tự vị trí 1..12 (hoặc 1..13)
-     fullArr[0] = vị trí 1, fullArr[11] = vị trí 12
-     "Gần vị trí 12 nhất" = index lớn nhất trong fullArr                */
-
-  let gIdx = -1; // index 0-based trong fullArr (= vị trí - 1)
+  let gIdx = -1;
   for (let i = 11; i >= 0; i--) {
     if (state.matrix[i].n === state.tuong.n) { gIdx = i; break; }
   }
 
-  let fullArr = [...state.matrix]; // index 0 = vị trí 1, index 11 = vị trí 12
+  let fullArr = [...state.matrix];
 
   if (gIdx === -1) {
-    // Không trùng → Tượng Trưng đứng ở vị trí 13 (CỰC TRÁI, nối thêm vào đầu mảng)
-    // fullArr sẽ là [vị trí1, vị trí2, ..., vị trí12, vị trí13]
     fullArr.push(state.tuong);
-    gIdx = 12; // index 0-based của vị trí 13
+    gIdx = 12;
     document.getElementById('symbol13').innerHTML =
       `<div class="card ${state.css} goc-highlight" style="display:flex; width:22%; min-width:68px;">
         <span class="num-tag">13</span>
@@ -672,23 +652,14 @@ function processResults() {
         <div class="card-gender">${state.tuong.f}</div>
       </div>`;
   } else {
-    // Highlight lá tương ứng trong lưới 12 lá (card id = gIdx+1)
     document.getElementById('card' + (gIdx + 1)).classList.add('goc-highlight');
   }
 
-  /* ── 5 Lá Linh Hồn ──────────────────────────────────────────
-     Trục đếm: 12-11-10-...-2-1-12-11-... (đếm NGƯỢC về GỐC, vòng lại)
-     Quy tắc:
-       Lần 1: Lá Tượng Trưng = bước 1, đếm thêm 4 bước ngược → lùi 4
-       Lần 2+: gối đầu = lá liền sau lá vừa chọn (lùi 1) rồi đếm thêm 4 = tổng lùi 5
-     Ví dụ Tượng Trưng vị trí 2 (len=12): 10, 5, 12, 7, 2                */
-
   state.souls = [];
-  // Chuyển sang 1-based để dễ theo dõi
-  let cursorPos = gIdx + 1; // vị trí 1-based (1..len)
+  let cursorPos = gIdx + 1;
   const lenF = fullArr.length;
   for (let i = 0; i < 5; i++) {
-    const step = (i === 0) ? 4 : 5; // lần 1 lùi 4, lần sau lùi 5
+    const step = (i === 0) ? 4 : 5;
     cursorPos = cursorPos - step;
     if (cursorPos <= 0) cursorPos += lenF;
     state.souls.push(fullArr[cursorPos - 1]);
@@ -704,12 +675,7 @@ function processResults() {
   });
   document.getElementById('soulGrid').innerHTML = soulH;
 
-  /* ── 3 KHÓM — Gom 12 lá trên trục, XÀO KỸ lại, rồi chia ────
-     Theo đúng phương pháp: 12 lá xếp trên trục được gom lại xào thật kỹ
-     sau đó chia thứ tự mới cho 3 khóm × 4 lá.
-     Dùng lại state.matrix (luôn đúng 12 lá, không bao gồm lá thứ 13).  */
   const reshuffled = secureShuffle([...state.matrix]);
-
   state.khoms = [];
   const labels = ['QUÁ KHỨ', 'HIỆN TẠI', 'TƯƠNG LAI'];
   let khomH = '';
@@ -732,12 +698,13 @@ function processResults() {
 
   document.getElementById('khomSection').innerHTML = khomH;
   document.getElementById('finalReport').style.display = 'block';
+
+  // Phát tín hiệu sự kiện để 6 module tự động nhận dữ liệu
+  window.dispatchEvent(new CustomEvent('ngulinh:completed', { detail: state }));
+
   setTimeout(() => document.getElementById('finalReport').scrollIntoView({ behavior:'smooth', block:'start' }), 120);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   COPY TO CLIPBOARD
-═══════════════════════════════════════════════════════════════ */
 function copyToClipboard() {
   const sel = document.getElementById('userChoice');
   const topicLabel = sel.options[sel.selectedIndex].text.replace('✦ ', '').trim();
@@ -769,7 +736,15 @@ function showToast() {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
+
+// Xuất ra window để 6 Module kết nối
+window.ngulinhState = state;
+window.setupNgulinh = setupNgulinh;
+window.flipCard = flipCard;
+window.copyToClipboard = copyToClipboard;
 </script>
-<script src="ketqua_bts.js"></script>
+
+<!-- Module kết nối dữ liệu (Cùng thư mục gốc trong Repository) -->
+<script src="ketqua_bts.js" defer></script>
 </body>
 </html>
